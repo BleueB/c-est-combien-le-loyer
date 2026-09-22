@@ -5,6 +5,34 @@
 const ANNONCES = [
 
   // --- Jour 1 ---
+  {
+    jour: 1,
+    ville: "Andernos-les-Bains",
+    titre: "Andernos-les-Bains (33510)",
+    sous_titre: "Maison · Location meublée",
+    coords: [44.74769, -1.092518],
+    zoom: 16,
+    tooltip: "Andernos-les-Bains (33510)",
+    loyer: 1400,
+    lien: "https://www.seloger.com/annonce/location/nouvelle-aquitaine/gironde-33/andernos-les-bains-33510/26PNBXNEVW2E?serp_view=list&search=distributionTypes%3DRent%26estateTypes%3DHouse%2CApartment%26locations%3DeyJwbGFjZUlkIjoiQUQwOEZSMTMzNjUiLCJyYWRpdXMiOjE5LCJwb2x5bGluZSI6Im1tcXFHfHFuRnBTZmVIentAeHlHeGFCbGNHfmNDYGNGfGBEenlEdHdEbGlDZmdFenNBZG9FYFtgb0V3XFx8ZkVpdUFkd0RtakNoYERlekRqY0N1YkZoYUJvYkdwe0BreEdsU3FjSG1Tb2NIcXtAa3hHaWFCb2JHa2NDd2JGaWBEZXpEZXdEbWpDfWZFaXVBYW9FdVxcZW9FflpnZ0V6c0F1d0RsaUN9YER6eURfZENgY0Z5YUJsY0d7e0B4eUdxU2ZlSCIsImNvb3JkaW5hdGVzIjp7ImxhdCI6NDQuODE1OTUyMTY4MjUyMTgsImxuZyI6LTEuMjI2NzExMDIwODU4ODU3Nn19%26method%3Dform#ln=classified_search_results&m=classified_search_results_classified_classified_detail_M",
+    source: "SeLoger",
+    badges: [
+      { label: "Surface", value: "110 m²" },
+      { label: "Pièces", value: "4 pièces · 3 ch." },
+      { label: "Étage", value: "RDC · Plain-pied" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "Jardin 650 m²" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entièrement rénové" },
+      { label: "DPE", value: "Non communiqué" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🔇 Calme · 🏠 Cave · 🏊 Piscine · 🔥 Poêle",
+    note: "Plain-pied · 110 m² · 3 chambres · jardin 650 m² · 🏊 piscine · quartier calme",
+  },
 
   /* SUPPRIMÉ jour 1
   {
