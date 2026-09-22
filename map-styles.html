@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comparaison styles de cartes</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: #f0f2f5;
+      padding: 24px 16px 48px;
+      color: #1f2328;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #57606a;
+      font-size: 0.88rem;
+      margin-bottom: 28px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .map-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .map-card .map { height: 220px; }
+    .map-card .info {
+      padding: 14px 16px;
+    }
+    .map-card .name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 3px;
+    }
+    .map-card .desc {
+      font-size: 0.8rem;
+      color: #57606a;
+      line-height: 1.45;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    .tag.free { background: #dcfce7; color: #15803d; }
+    .tag.key  { background: #fef9c3; color: #854d0e; }
+  </style>
+</head>
+<body>
+
+<h1>🗺️ Comparaison styles de cartes</h1>
+<p class="subtitle">Même zone · Quartier Californie, Nice · Zoom 14</p>
+
+<div class="grid">
+
+  <!-- 1. OSM Standard -->
+  <div class="map-card">
+    <div class="map" id="m1"></div>
+    <div class="info">
+      <div class="name">OpenStreetMap Standard</div>
+      <div class="desc">Le style par défaut. Coloré, détaillé, familier. Actuellement utilisé dans le jeu.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 2. CartoDB Positron -->
+  <div class="map-card">
+    <div class="map" id="m2"></div>
+    <div class="info">
+      <div class="name">CartoDB Positron</div>
+      <div class="desc">Très épuré, fond gris clair, textes légers. Idéal pour une interface moderne et sobre.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 3. CartoDB Dark Matter -->
+  <div class="map-card">
+    <div class="map" id="m3"></div>
+    <div class="info">
+      <div class="name">CartoDB Dark Matter</div>
+      <div class="desc">Fond noir avec rues dorées. Élégant, mode sombre. Très tendance pour les apps modernes.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 4. Stamen Toner -->
+  <div class="map-card">
+    <div class="map" id="m4"></div>
+    <div class="info">
+      <div class="name">Stadia Toner</div>
+      <div class="desc">Noir et blanc très contrasté, style graphique. Marquant visuellement, lecture rapide.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 5. Stamen Watercolor -->
+  <div class="map-card">
+    <div class="map" id="m5"></div>
+    <div class="info">
+      <div class="name">Stadia Watercolor</div>
+      <div class="desc">Style aquarelle artistique. Original et chaleureux, mais moins lisible pour les détails.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 6. OpenTopoMap -->
+  <div class="map-card">
+    <div class="map" id="m6"></div>
+    <div class="info">
+      <div class="name">OpenTopoMap</div>
+      <div class="desc">Relief topographique avec courbes de niveau. Utile pour voir le terrain (collines, côte).</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 7. Esri World Imagery -->
+  <div class="map-card">
+    <div class="map" id="m7"></div>
+    <div class="info">
+      <div class="name">Esri Satellite</div>
+      <div class="desc">Vue satellite réelle. On voit les toits, les parcs, la mer. Très parlant pour localiser un bien.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+  <!-- 8. Esri World Street -->
+  <div class="map-card">
+    <div class="map" id="m8"></div>
+    <div class="info">
+      <div class="name">Esri Street Map</div>
+      <div class="desc">Style similaire à Google Maps, coloré et détaillé. Très lisible et familier pour tous.</div>
+      <span class="tag free">✅ Gratuit · Sans clé</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const LAT = 43.7008, LNG = 7.2731, ZOOM = 14;
+
+  function makeMap(id, tileUrl, options = {}) {
+    const m = L.map(id, { zoomControl: false, scrollWheelZoom: false, dragging: true })
+               .setView([LAT, LNG], ZOOM);
+    L.tileLayer(tileUrl, { maxZoom: 19, ...options }).addTo(m);
+    const icon = L.divIcon({
+      html: '<div style="background:#e53e3e;width:12px;height:12px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>',
+      className: '', iconSize: [12,12], iconAnchor: [6,6]
+    });
+    L.marker([LAT, LNG], { icon }).addTo(m);
+    return m;
+  }
+
+  makeMap('m1',
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: '© OpenStreetMap' }
+  );
+
+  makeMap('m2',
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    { attribution: '© CartoDB' }
+  );
+
+  makeMap('m3',
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    { attribution: '© CartoDB' }
+  );
+
+  makeMap('m4',
+    'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png',
+    { attribution: '© Stadia Maps' }
+  );
+
+  makeMap('m5',
+    'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg',
+    { attribution: '© Stadia Maps' }
+  );
+
+  makeMap('m6',
+    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    { attribution: '© OpenTopoMap' }
+  );
+
+  makeMap('m7',
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: '© Esri' }
+  );
+
+  makeMap('m8',
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    { attribution: '© Esri' }
+  );
+</script>
+
+</body>
+</html>

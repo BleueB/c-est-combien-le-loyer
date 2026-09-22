@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C'est Combien Ton Loyer ? 🏠</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="annonces.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: #f0f2f5;
+      color: #1f2328;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      color: #57606a;
+      font-size: 0.92rem;
+      margin-top: 5px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .annonce-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #1f2328;
+    }
+    .annonce-sub {
+      font-size: 0.85rem;
+      color: #57606a;
+      margin-bottom: 18px;
+    }
+
+    /* Map interactive */
+    .map-wrap {
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Badge grid */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 9px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .badge .label {
+      font-size: 0.68rem;
+      color: #57606a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .badge .value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1f2328;
+    }
+    .badge-full {
+      grid-column: 1 / -1;
+    }
+    .badge-full .value {
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .note {
+      background: #f7f8fa;
+      border-left: 3px solid #3b82d4;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      font-size: 0.87rem;
+      color: #57606a;
+      margin-bottom: 24px;
+      line-height: 1.55;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 20px 0;
+    }
+
+    /* Estimation */
+    .estimation-zone label {
+      display: block;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(to right, #3b82d4 0%, #3b82d4 22%, #e5e7eb 22%, #e5e7eb 100%);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #3b82d4;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    .amount-input {
+      width: 106px;
+      padding: 9px 10px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1f2328;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .amount-input:focus { border-color: #3b82d4; }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #57606a;
+      margin-bottom: 20px;
+      padding: 0 2px;
+    }
+
+    .btn-valider {
+      width: 100%;
+      padding: 14px;
+      background: #3b82d4;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-valider:hover { background: #2563b0; }
+
+    /* Résultat */
+    .resultat { display: none; margin-top: 24px; }
+
+    .score-block {
+      text-align: center;
+      padding: 26px 16px 20px;
+      background: #f7f8fa;
+      border-radius: 14px;
+      margin-bottom: 18px;
+    }
+    .emoji-verdict { font-size: 2.4rem; margin-bottom: 6px; }
+    .score-label { font-size: 0.82rem; color: #57606a; margin-bottom: 4px; }
+    .score-number {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: #3b82d4;
+      line-height: 1;
+    }
+    .score-max { font-size: 0.85rem; color: #57606a; margin-top: 4px; }
+    .verdict-text { font-size: 1rem; font-weight: 700; color: #1f2328; margin-top: 10px; }
+    .verdict-sub { font-size: 0.83rem; color: #57606a; margin-top: 3px; }
+
+    .reveal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 13px 16px;
+      margin-bottom: 10px;
+    }
+    .reveal-row .rl { font-size: 0.83rem; color: #57606a; }
+    .reveal-row .rv { font-size: 1.05rem; font-weight: 700; }
+    .reveal-row .rv.green { color: #16a34a; }
+    .reveal-row .rv.orange { color: #d97706; }
+    .reveal-row .rv.red { color: #dc2626; }
+
+    .precision-wrap { margin-bottom: 20px; }
+    .precision-label { font-size: 0.78rem; color: #57606a; margin-bottom: 6px; }
+    .precision-bg {
+      background: #e5e7eb;
+      border-radius: 6px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .precision-fill {
+      height: 10px;
+      border-radius: 6px;
+      background: linear-gradient(to right, #3b82d4, #7c5cd8);
+      transition: width 0.7s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+
+    .btn-annonce {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px;
+      border: 1.5px solid #3b82d4;
+      border-radius: 10px;
+      color: #3b82d4;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      transition: background 0.15s;
+    }
+    .btn-annonce:hover { background: #eff6ff; }
+
+    .btn-partager {
+      width: 100%;
+      padding: 13px;
+      background: #1f2328;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-partager:hover { background: #333; }
+
+    /* Bouton annonce suivante */
+    .btn-suivante {
+      width: 100%;
+      padding: 13px;
+      background: #3b82d4;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 10px;
+    }
+    .btn-suivante:hover { background: #2563b0; }
+
+    /* Récap final */
+    .recap-block {
+      text-align: center;
+      padding: 32px 20px 24px;
+    }
+    .recap-emoji { font-size: 3rem; margin-bottom: 10px; }
+    .recap-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+    .recap-sub { font-size: 0.9rem; color: #57606a; margin-bottom: 24px; }
+    .recap-score-label { font-size: 0.82rem; color: #57606a; margin-bottom: 4px; }
+    .recap-score {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #3b82d4;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .recap-score-max { font-size: 0.88rem; color: #57606a; margin-bottom: 24px; }
+    .recap-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .recap-ligne {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+    }
+    .recap-ligne .rl { color: #57606a; }
+    .recap-ligne .rv { font-weight: 700; }
+
+    /* Navigation */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .nav-btn {
+      background: #f7f8fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1f2328;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: #e5e7eb; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-counter {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #57606a;
+    }
+
+    footer {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #adb5bd;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 14px;
+      width: 100%;
+      max-width: 640px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🏠 C'est Combien Ton Loyer ?</h1>
+  <p>Devinez le loyer de l'annonce du jour — charges comprises</p>
+</header>
+
+<div class="card" id="card">
+  <!-- Contenu généré dynamiquement par renderAnnonce() -->
+</div>
+
+<footer>
+  C'est Combien Ton Loyer ? · Nice
+</footer>
+
+<script>
+  const SLIDER_MIN = 300;
+  const SLIDER_MAX = 3000;
+
+  const NB_MANCHES = 5;
+  let currentIndex = 0;
+  let ordre = [];
+  let scores = []; // { annonce, estimation, score, ecart }
+
+  // --- SHUFFLE ---
+  // --- SESSION (localStorage) ---
+  const LS_KEY = 'cctl_vus';
+
+  function getVus() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function marquerVus(ids) {
+    const vus = getVus();
+    const nouveaux = [...new Set([...vus, ...ids])];
+    // Si tous les IDs du jeu ont été vus, on remet à zéro
+    const tousIds = ANNONCES.map(a => a.id);
+    const restants = tousIds.filter(id => !nouveaux.includes(id));
+    localStorage.setItem(LS_KEY, JSON.stringify(restants.length >= NB_MANCHES ? nouveaux : []));
+  }
+
+  function piocherOrdre() {
+    const tousIds   = ANNONCES.map(a => a.id);
+    const vus       = getVus();
+    const nonVus    = tousIds.filter(id => !vus.includes(id));
+    const source    = nonVus.length >= NB_MANCHES ? nonVus : tousIds;
+    const shuffled  = shuffleArray(source.map(id => ANNONCES.findIndex(a => a.id === id)));
+    return shuffled.slice(0, NB_MANCHES);
+  }
+
+  function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // --- RENDER ---
+  function renderAnnonce(a) {
+    const pos = currentIndex + 1;
+    const total = NB_MANCHES;
+    const badgesHTML = a.badges.map(b =>
+      `<div class="badge"><span class="label">${b.label}</span><span class="value">${b.value}</span></div>`
+    ).join('');
+
+    document.getElementById('card').innerHTML = `
+      <div class="nav-bar">
+        <button class="nav-btn" onclick="goTo(currentIndex - 1)" ${currentIndex === 0 ? 'disabled' : ''}>← Précédente</button>
+        <span class="nav-counter">${pos} / ${total}</span>
+        <button class="nav-btn" onclick="goTo(currentIndex + 1)" ${scores[currentIndex] === undefined || currentIndex === total - 1 ? 'disabled' : ''}>Suivante →</button>
+      </div>
+      <div class="annonce-title">📍 ${a.titre}</div>
+      <div class="annonce-sub">${a.sous_titre.replace(/(Meublé|Location vide|Location meublée[^<]*)/g, '<strong style="color:#1f2328">$1</strong>')}</div>
+      <div class="map-wrap"><div id="map"></div></div>
+      <div class="badge-grid">
+        ${badgesHTML}
+        <div class="badge badge-full">
+          <span class="label">Particularités</span>
+          <span class="value">${a.particularites}</span>
+        </div>
+      </div>
+      <div class="note">${a.note}</div>
+      <hr class="divider" />
+      <div class="estimation-zone" id="zoneEstimation">
+        <label>💶 Votre estimation (charges comprises)</label>
+        <div class="slider-row">
+          <input type="range" id="slider" min="${SLIDER_MIN}" max="${SLIDER_MAX}" value="900" step="10"
+            oninput="syncFromSlider(this.value)" />
+          <input type="number" id="montant" class="amount-input" value="900"
+            min="${SLIDER_MIN}" max="${SLIDER_MAX}" oninput="syncFromInput(this.value)" />
+        </div>
+        <div class="slider-labels">
+          <span>${SLIDER_MIN} €</span>
+          <span>${Math.round((SLIDER_MIN + SLIDER_MAX) / 2)} €</span>
+          <span>${SLIDER_MAX} €</span>
+        </div>
+        <button class="btn-valider" onclick="valider()">Valider mon estimation →</button>
+      </div>
+      <div class="resultat" id="resultat" style="display:none">
+        <div class="score-block">
+          <div class="emoji-verdict" id="emojiVerdict">🎯</div>
+          <div class="score-label">Votre score</div>
+          <div class="score-number" id="scoreAffiche">0</div>
+          <div class="score-max">/ 1 000 points</div>
+          <div class="verdict-text" id="verdictText"></div>
+          <div class="verdict-sub" id="verdictSub"></div>
+        </div>
+        <div class="reveal-row">
+          <span class="rl">Votre estimation</span>
+          <span class="rv" id="estimAffiche">—</span>
+        </div>
+        <div class="reveal-row">
+          <span class="rl">Loyer réel (CC)</span>
+          <span class="rv green" id="loyerReel">${a.loyer.toLocaleString('fr-FR')} €/mois</span>
+        </div>
+        <div class="precision-wrap">
+          <div class="precision-label">Précision</div>
+          <div class="precision-bg"><div class="precision-fill" id="precisionFill"></div></div>
+        </div>
+        <a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce">
+          🔗 Voir la vraie annonce ${a.source}
+        </a>
+        <button class="btn-suivante" id="btnSuivante" style="display:none" onclick="goTo(currentIndex + 1)">
+          Annonce suivante →
+        </button>
+        <button class="btn-suivante" id="btnRecap" style="display:none;background:#7c5cd8" onclick="afficherRecap()">
+          Voir mon récap 🏁
+        </button>
+      </div>
+    `;
+
+    initMap(a);
+    updateSliderBg(900);
+  }
+
+  // --- RÉCAP ---
+  function getVerdictGlobal(total, max) {
+    const pct = total / max;
+    if (pct >= 0.9) return { emoji: '🏆', text: 'Expert du marché niçois !', sub: pick(['Vous pouvez ouvrir votre agence.', 'Ben Arfa vous recruterait comme scout immo.', 'Uno di noi ! Uno di noi !']) };
+    if (pct >= 0.7) return { emoji: '🌟', text: 'Très bon score !', sub: pick(['Vous sentez le marché.', 'Quelques loyers vous ont résisté, mais pas beaucoup.', 'Les agences niçoises tremblent.']) };
+    if (pct >= 0.5) return { emoji: '🙂', text: 'Pas mal du tout !', sub: pick(['Nice ne vous a pas totalement roulé dans la farine.', 'Encore quelques parties et vous serez imbattable.', 'Dans la moyenne, c\'est déjà ça !']) };
+    if (pct >= 0.3) return { emoji: '😬', text: 'Peut mieux faire…', sub: pick(['Nice vous a bien eu.', 'Le marché niçois garde ses secrets.', 'Fada ? Peut-être un peu, oui.']) };
+    return { emoji: '💸', text: 'Aïe aïe aïe !', sub: pick(['Vous cherchez vraiment à Limoges ?', 'Tu n\'es pas un vrai Nissart !', 'Le marché niçois n\'a fait qu\'une bouchée de vous.']) };
+  }
+
+  function afficherRecap() {
+    const total = scores.reduce((s, r) => s + r.score, 0);
+    const max = NB_MANCHES * 1000;
+    const v = getVerdictGlobal(total, max);
+
+    const lignesHTML = scores.map((r, i) => {
+      const ecartStr = (r.ecart >= 0 ? '+' : '') + r.ecart.toLocaleString('fr-FR') + ' €';
+      const col = Math.abs(r.ecart) <= 50 ? 'green' : Math.abs(r.ecart) <= 150 ? 'orange' : 'red';
+      return `
+        <div class="recap-ligne">
+          <span class="rl">${i + 1}. ${r.annonce.titre.split(',')[0]}</span>
+          <span style="display:flex;align-items:center;gap:10px">
+            <span class="rv">${r.score} pts</span>
+            <span class="rv ${col}" style="font-size:0.8rem">${ecartStr}</span>
+            <a href="${r.annonce.lien}" target="_blank" rel="noopener"
+               style="color:#3b82d4;font-size:0.8rem;font-weight:700;text-decoration:none;border:1px solid #3b82d4;border-radius:6px;padding:2px 8px;white-space:nowrap">
+              Voir →
+            </a>
+          </span>
+        </div>`;
+    }).join('');
+
+    document.getElementById('card').innerHTML = `
+      <div class="recap-block">
+        <div class="recap-emoji">${v.emoji}</div>
+        <div class="recap-title">${v.text}</div>
+        <div class="recap-sub">${v.sub}</div>
+        <div class="recap-score-label">Score total</div>
+        <div class="recap-score" id="recapScoreAnim">0</div>
+        <div class="recap-score-max">/ ${max.toLocaleString('fr-FR')} points</div>
+      </div>
+      <div class="recap-detail">${lignesHTML}</div>
+      <button class="btn-partager" onclick="partagerRecap(${total}, ${max})">📤 Partager mon score</button>
+      <button class="btn-suivante" style="margin-top:10px;background:#7c5cd8" onclick="rejouer()">🔀 Rejouer</button>
+    `;
+
+    animerScoreEl(document.getElementById('recapScoreAnim'), total);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function partagerRecap(total, max) {
+    const texte = `🏠 C'est Combien Ton Loyer ?\nScore total : ${total} / ${max} pts sur ${NB_MANCHES} manches\nEssayez vous aussi !`;
+    if (navigator.share) navigator.share({ title: "C'est Combien Ton Loyer ?", text: texte });
+    else if (navigator.clipboard) navigator.clipboard.writeText(texte).then(() => alert('Score copié !'));
+  }
+
+  // --- MAP ---
+  function initMap(a) {
+    const map = L.map('map', {
+      zoomControl: true, scrollWheelZoom: false,
+      dragging: true, attributionControl: false
+    }).setView(a.coords, a.zoom);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19
+    }).addTo(map);
+    L.control.attribution({ prefix: '© Esri' }).addTo(map);
+    const pinIcon = L.divIcon({
+      html: '<div style="background:#3b82d4;width:13px;height:13px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4)"></div>',
+      className: '', iconSize: [13,13], iconAnchor: [6,6]
+    });
+    L.marker(a.coords, { icon: pinIcon }).addTo(map)
+      .bindTooltip(a.tooltip, { permanent: true, direction: 'top', offset: [0,-10] });
+  }
+
+  // --- SLIDER ---
+  function updateSliderBg(val) {
+    const pct = ((val - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
+    document.getElementById('slider').style.background =
+      `linear-gradient(to right, #3b82d4 0%, #3b82d4 ${pct}%, #e5e7eb ${pct}%, #e5e7eb 100%)`;
+  }
+  function syncFromSlider(val) {
+    document.getElementById('montant').value = val;
+    updateSliderBg(val);
+  }
+  function syncFromInput(val) {
+    const v = Math.min(Math.max(parseInt(val) || SLIDER_MIN, SLIDER_MIN), SLIDER_MAX);
+    document.getElementById('slider').value = v;
+    updateSliderBg(v);
+  }
+
+  // --- SCORE ---
+  function calculerScore(estimation, reel) {
+    // Écart normalisé par rapport au loyer : 15% d'écart = ~500 pts
+    return Math.round(1000 * Math.exp(-Math.abs(estimation - reel) / (reel * 0.15)));
+  }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function getVerdict(score) {
+    if (score >= 900) return {
+      emoji: '🎯',
+      text: pick(['Parfait !', 'En feu comme Ben Arfa !', 'Uno di noi !']),
+      sub: pick(['Vous connaissez ce marché sur le bout des doigts.', 'Agent immobilier en secret ?', 'Vous auriez fait une offre sans hésiter.', 'Même les agences vous embaucheraient.'])
+    };
+    if (score >= 700) return {
+      emoji: '🔥',
+      text: pick(['Très proche !', 'Vous avez l\'œil !']),
+      sub: pick(['Excellent sens du marché.', 'Vous sentez le marché de la Côte d\'Azur.', '50 € près, c\'est presque du sans-faute.'])
+    };
+    if (score >= 450) return {
+      emoji: '👍',
+      text: pick(['Pas mal !', 'Dans la bonne fourchette !']),
+      sub: pick(['Vous vous en sortez bien.', 'Pas agent immo, mais pas loin.', 'Vous vous défendez bien !'])
+    };
+    if (score >= 150) return {
+      emoji: '😅',
+      text: 'Raté…',
+      sub: pick(['Mèfi ne te mérite pas !', 'Le marché vous a eu cette fois !', 'Nice vous a bien roulé dans la farine.', 'Le propriétaire aurait adoré votre offre.'])
+    };
+    return {
+      emoji: '💸',
+      text: 'Aïe !',
+      sub: pick(['Fada !', 'Tu n\'es pas un vrai Nissart !', 'Le marché n\'a pas fini de vous surprendre.', 'C\'est ça, la Côte d\'Azur.', 'Vous cherchez plutôt à Limoges ?'])
+    };
+  }
+
+  function valider() {
+    const estimation = parseInt(document.getElementById('montant').value) || 900;
+    const a = ANNONCES[ordre[currentIndex]];
+    const score = calculerScore(estimation, a.loyer);
+    const ecart = estimation - a.loyer;
+    const ecartAbs = Math.abs(ecart);
+    const verdict = getVerdict(score);
+
+    // Stocker le résultat
+    scores[currentIndex] = { annonce: a, estimation, score, ecart };
+
+    document.getElementById('emojiVerdict').textContent = verdict.emoji;
+    document.getElementById('verdictText').textContent = verdict.text;
+    document.getElementById('verdictSub').textContent = verdict.sub;
+    document.getElementById('estimAffiche').textContent = estimation.toLocaleString('fr-FR') + ' €';
+
+    const colorClass = ecartAbs <= 50 ? 'green' : ecartAbs <= 150 ? 'orange' : 'red';
+    const ecartStr = (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' €';
+    document.getElementById('loyerReel').innerHTML =
+      `${a.loyer.toLocaleString('fr-FR')} €/mois <span style="font-size:0.82rem;font-weight:600" class="${colorClass}">(${ecartStr})</span>`;
+
+    setTimeout(() => { document.getElementById('precisionFill').style.width = (score / 10) + '%'; }, 120);
+    animerScore(score);
+    document.getElementById('zoneEstimation').style.display = 'none';
+    document.getElementById('resultat').style.display = 'block';
+
+    // Afficher le bon bouton selon position
+    const estDerniere = currentIndex === ordre.length - 1;
+    document.getElementById('btnSuivante').style.display = estDerniere ? 'none' : 'block';
+    document.getElementById('btnRecap').style.display = estDerniere ? 'block' : 'none';
+
+    document.getElementById('resultat').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function animerScore(score) {
+    animerScoreEl(document.getElementById('scoreAffiche'), score);
+  }
+
+  function animerScoreEl(el, cible) {
+    const duree = 900, debut = Date.now();
+    function tick() {
+      const t = Math.min((Date.now() - debut) / duree, 1);
+      el.textContent = Math.round((1 - Math.pow(1 - t, 3)) * cible);
+      if (t < 1) requestAnimationFrame(tick); else el.textContent = cible;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // --- NAVIGATION ---
+  function goTo(index) {
+    if (index < 0 || index >= ordre.length) return;
+    currentIndex = index;
+    renderAnnonce(ANNONCES[ordre[currentIndex]]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // --- REJOUER ---
+  function rejouer() {
+    marquerVus(ordre.map(i => ANNONCES[i].id));
+    ordre = piocherOrdre();
+    scores = [];
+    currentIndex = 0;
+    renderAnnonce(ANNONCES[ordre[0]]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // --- INIT ---
+  ordre = piocherOrdre();
+  renderAnnonce(ANNONCES[ordre[0]]);
+</script>
+
+</body>
+</html>
