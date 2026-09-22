@@ -537,7 +537,7 @@
           <div class="precision-label">Précision</div>
           <div class="precision-bg"><div class="precision-fill" id="precisionFill"></div></div>
         </div>
-        ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}">
+        ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" onclick="if(typeof umami!=='undefined')umami.track('voir-annonce',{source:${JSON.stringify(a.source)},context:'manche'})">
           <span class="badge-source">${sourceAbbrev(a.source)}</span>
           Voir l'annonce
         </a>` : ''}
@@ -579,7 +579,7 @@
           <span style="display:flex;align-items:center;gap:10px">
             <span class="rv">${r.score} pts</span>
             <span class="rv ${col}" style="font-size:0.8rem">${ecartStr}</span>
-            ${r.annonce.lien ? `<a href="${r.annonce.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(r.annonce.source)}" style="margin:0;padding:3px 9px;font-size:0.75rem;border-width:1.5px;white-space:nowrap">
+            ${r.annonce.lien ? `<a href="${r.annonce.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(r.annonce.source)}" style="margin:0;padding:3px 9px;font-size:0.75rem;border-width:1.5px;white-space:nowrap" onclick="if(typeof umami!=='undefined')umami.track('voir-annonce',{source:${JSON.stringify(r.annonce.source)},context:'recap'})">
               <span class="badge-source" style="font-size:0.65rem;padding:1px 5px">${sourceAbbrev(r.annonce.source)}</span> →
             </a>` : ''}
           </span>
