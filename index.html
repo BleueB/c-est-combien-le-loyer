@@ -607,7 +607,13 @@
   function trackVoirAnnonce(el, context) {
     if (typeof umami === 'undefined') return;
     const source = el.querySelector('.badge-source') ? el.querySelector('.badge-source').textContent.trim() : '?';
-    umami.track('voir-annonce', { source, context: context || 'manche' });
+    const url = el.href || '';
+    const destination = url.includes('seloger') ? 'SeLoger'
+      : url.includes('bienici') ? "Bien'ici"
+      : url.includes('pap.fr') ? 'PAP'
+      : url.includes('leboncoin') ? 'LeBonCoin'
+      : source;
+    umami.track('voir-annonce', { source, destination, context: context || 'manche' });
   }
 
   function partagerRecap(total, max) {
