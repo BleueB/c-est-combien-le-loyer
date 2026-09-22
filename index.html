@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>C'est Combien Ton Loyer ? 🏠</title>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="annonces.js"></script>
@@ -567,6 +568,7 @@
     const total = scores.reduce((s, r) => s + r.score, 0);
     const max = NB_MANCHES * 1000;
     const v = getVerdictGlobal(total, max);
+    if (typeof umami !== 'undefined') umami.track('partie-terminee', { score: total });
 
     const lignesHTML = scores.map((r, i) => {
       const ecartStr = (r.ecart >= 0 ? '+' : '') + r.ecart.toLocaleString('fr-FR') + ' €';
@@ -605,6 +607,7 @@
   function partagerRecap(total, max) {
     const lien = 'https://cest-combien-ton-loyer.netlify.app';
     const texte = `🏠 J'ai fait ${total} points à "C'est combien ton loyer ?" — t'arrives à me battre ?\n${lien}`;
+    if (typeof umami !== 'undefined') umami.track('score-partage', { score: total });
     if (navigator.share) {
       navigator.share({ title: "C'est Combien Ton Loyer ?", text: texte }).catch(() => {});
     } else if (navigator.clipboard) {
