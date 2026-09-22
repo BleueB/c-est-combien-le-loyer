@@ -383,6 +383,57 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── fonction partagée : construire une annonce depuis données Bien'ici ────────
+  function buildAnnonceFromBienici(d, url) {
+    const pos = d.blurInfo?.position || d.blurInfo;
+    const lat = pos?.lat, lng = pos?.lon;
+    if (!lat || !lng) throw new Error('Coordonnées GPS manquantes');
+
+    // Particularités auto depuis les données API
+    const parts = [];
+    if (d.floor > 0)              parts.push(`${d.floor}e étage`);
+    else if (d.floor === 0)       parts.push('RDC');
+    if (d.hasElevator === true)   parts.push('🛗 Ascenseur');
+    if (d.hasCellar === true)     parts.push('🪣 Cave');
+    if (d.hasBalcony === true)    parts.push('🌿 Balcon');
+    if (d.hasTerrace === true)    parts.push('☀️ Terrasse');
+    if (d.hasParking === true || (d.enclosedParkingQuantity > 0) || (d.outdoorParkingQuantity > 0))
+                                  parts.push('🚗 Parking');
+    if (d.hasPool === true)       parts.push('🏊 Piscine');
+    if (d.hasFirePlace === true)  parts.push('🔥 Cheminée');
+    if (d.yearOfConstruction)     parts.push(`Construit en ${d.yearOfConstruction}`);
+    if (d.heating)                parts.push(`Chauffage : ${d.heating}`);
+    if (d.exposition)             parts.push(`Exposition : ${d.exposition}`);
+    if (d.charges > 0)            parts.push(`Charges : ${d.charges}€/mois`);
+
+    // Note : extrait les 2 premières phrases de la description
+    const desc = (d.description || '').replace(/<[^>]+>/g, '').trim();
+    const sentences = desc.split(/(?<=[.!?])\s+/);
+    const note = sentences.slice(0, 2).join(' ').slice(0, 200);
+
+    return {
+      titre:          `${d.district?.libelle || d.city || 'Nice'}, ${d.roomsQuantity || '?'}p · ${d.surfaceArea || '?'}m²`,
+      sous_titre:     `${d.city || 'Nice'} · ${d.postalCode || ''}`,
+      coords:         [parseFloat(lat.toFixed(5)), parseFloat(lng.toFixed(5))],
+      zoom:           16,
+      tooltip:        `${d.district?.libelle || d.city || 'Nice'}`,
+      loyer:          Math.round(d.price),
+      lien:           url,
+      source:         "Bien'ici",
+      badges: [
+        { label: 'Surface',  value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
+        { label: 'Pièces',   value: String(d.roomsQuantity || '?') },
+        { label: 'Meublé',   value: d.isFurnished === true ? 'Oui' : 'Non' },
+        { label: 'DPE',      value: d.energyClassification && d.energyClassification !== 'NS' ? `${d.energyClassification} · GES ${d.greenhouseGazClassification || '?'}` : 'NS' },
+        ...(d.hasBalcony  === true ? [{ label: 'Balcon',   value: '✓' }] : []),
+        ...(d.hasTerrace  === true ? [{ label: 'Terrasse', value: '✓' }] : []),
+        ...((d.hasParking === true || d.enclosedParkingQuantity > 0) ? [{ label: 'Parking', value: '✓' }] : []),
+      ],
+      particularites: parts.join(' · '),
+      note,
+    };
+  }
+
   // POST /import-masse
   if (req.method === 'POST' && req.url === '/import-masse') {
     try {
@@ -393,7 +444,6 @@ const server = http.createServer(async (req, res) => {
       const details = [];
       let nbOk = 0, nbDoublons = 0, nbErreurs = 0;
 
-      // Traitement séquentiel pour éviter de surcharger l'API Bien'ici
       for (const url of urls) {
         const bieniciId = extractBieniciId(url);
         if (!bieniciId) {
@@ -401,7 +451,6 @@ const server = http.createServer(async (req, res) => {
           nbErreurs++; continue;
         }
 
-        // Vérifier doublon avant fetch
         const src = fs.readFileSync(ANNONCES, 'utf8');
         const lienBase = url.split('?')[0].replace(/\/$/, '');
         const liens = [...src.matchAll(/lien:\s*"([^"]+)"/g)].map(m => m[1].split('?')[0].replace(/\/$/, ''));
@@ -412,62 +461,111 @@ const server = http.createServer(async (req, res) => {
 
         try {
           const d = await fetchJSON(`https://www.bienici.com/realEstateAd.json?id=${bieniciId}`);
+          if (!d || !d.price || d.price <= 0)     { details.push({ url, status: 'erreur', message: 'Prix manquant' }); nbErreurs++; continue; }
+          if (d.adType !== 'rent')                 { details.push({ url, status: 'erreur', message: `Type "${d.adType}" — pas une location` }); nbErreurs++; continue; }
+          if (d.status?.onTheMarket === false)      { details.push({ url, status: 'erreur', message: 'Annonce retirée du marché' }); nbErreurs++; continue; }
 
-          if (!d || !d.price || d.price <= 0)              { details.push({ url, status: 'erreur', message: 'Prix manquant ou invalide' }); nbErreurs++; continue; }
-          if (d.adType !== 'rent')                          { details.push({ url, status: 'erreur', message: `Type "${d.adType}" — pas une location` }); nbErreurs++; continue; }
-          if (d.status?.onTheMarket === false)               { details.push({ url, status: 'erreur', message: 'Annonce retirée du marché' }); nbErreurs++; continue; }
-
-          // Coordonnées
-          const pos = d.blurInfo?.position || d.blurInfo;
-          const lat = pos?.lat, lng = pos?.lon;
-          if (!lat || !lng)                                  { details.push({ url, status: 'erreur', message: 'Coordonnées GPS manquantes' }); nbErreurs++; continue; }
-
-          // Construire l'annonce
-          const annonce = {
-            titre:       `${d.district?.libelle || d.city || 'Nice'}, ${d.roomsQuantity || '?'}p · ${d.surfaceArea || '?'}m²`,
-            sous_titre:  `${d.city || 'Nice'} · ${d.postalCode || ''}`,
-            coords:      [parseFloat(lat.toFixed(5)), parseFloat(lng.toFixed(5))],
-            zoom:        16,
-            tooltip:     `${d.district?.libelle || d.city || 'Nice'}`,
-            loyer:       Math.round(d.price),
-            lien:        url,
-            source:      "Bien'ici",
-            badges: [
-              { label: 'Surface',  value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
-              { label: 'Pièces',   value: String(d.roomsQuantity || '?') },
-              { label: 'Meublé',   value: d.isFurnished === true ? 'Oui' : 'Non' },
-              { label: 'DPE',      value: d.energyClassification || 'NS' },
-              ...(d.hasBalcony    === true ? [{ label: 'Balcon',   value: '✓' }] : []),
-              ...(d.hasTerrace    === true ? [{ label: 'Terrasse', value: '✓' }] : []),
-              ...(d.hasParking    === true ? [{ label: 'Parking',  value: '✓' }] : []),
-            ],
-            particularites: '',
-            note: '',
-          };
-
+          const annonce = buildAnnonceFromBienici(d, url);
           const id = appendAnnonce(annonce);
           details.push({ url, status: 'ok', message: `#${id} — ${annonce.loyer}€ — ${annonce.titre}` });
           nbOk++;
-
-          // Petite pause pour ne pas spammer l'API
           await new Promise(r => setTimeout(r, 300));
-
         } catch(e) {
           details.push({ url, status: 'erreur', message: e.message });
           nbErreurs++;
         }
       }
 
-      // Un seul git push à la fin
-      if (nbOk > 0) {
-        gitPush('masse', `${nbOk} annonces importées`).catch(e => console.error('git push échoué :', e.message));
-      }
+      if (nbOk > 0) gitPush('masse', `${nbOk} annonces importées`).catch(e => console.error('git push échoué :', e.message));
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: nbOk, doublons: nbDoublons, erreurs: nbErreurs, details }));
     } catch(e) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: 0, doublons: 0, erreurs: 1, details: [{ url: '', status: 'erreur', message: e.message }] }));
+    }
+    return;
+  }
+
+  // POST /enrichir-annonces — re-fetch toutes les annonces Bien'ici avec particularites/note vides
+  if (req.method === 'POST' && req.url === '/enrichir-annonces') {
+    try {
+      const src = fs.readFileSync(ANNONCES, 'utf8');
+      const mod = { exports: {} };
+      require('vm').runInNewContext(
+        `(function(module){ ${src.replace('const ANNONCES =', 'module.exports =')} })(module)`,
+        { module: mod }
+      );
+      const annonces = Array.isArray(mod.exports) ? mod.exports : [];
+
+      // Annonces Bien'ici avec particularites ou note vides
+      const aEnrichir = annonces.filter(a =>
+        a.source === "Bien'ici" && extractBieniciId(a.lien) && (!a.particularites || !a.note)
+      );
+
+      const details = [];
+      let nbOk = 0, nbErreurs = 0;
+
+      for (const a of aEnrichir) {
+        const bieniciId = extractBieniciId(a.lien);
+        try {
+          const d = await fetchJSON(`https://www.bienici.com/realEstateAd.json?id=${bieniciId}`);
+          if (!d || !d.price) { details.push({ id: a.id, status: 'erreur', message: 'API vide' }); nbErreurs++; continue; }
+
+          const enrichi = buildAnnonceFromBienici(d, a.lien);
+
+          // Mettre à jour particularites et note dans le fichier
+          let fileSrc = fs.readFileSync(ANNONCES, 'utf8');
+
+          // Trouver la position du bloc de cette annonce
+          const idIdx = fileSrc.search(new RegExp(`\\bid:\\s*${a.id}\\b`));
+          if (idIdx === -1) { details.push({ id: a.id, status: 'erreur', message: 'Introuvable dans fichier' }); nbErreurs++; continue; }
+          let start = fileSrc.lastIndexOf('\n  {', idIdx) + 1;
+          let depth = 0, end = -1;
+          for (let i = start; i < fileSrc.length; i++) {
+            if (fileSrc[i] === '{') depth++;
+            else if (fileSrc[i] === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+          }
+          if (fileSrc[end] === ',') end++;
+
+          // Reconstruire le bloc complet avec les nouveaux champs
+          const badges = enrichi.badges.map(b => `      { label: "${esc(b.label)}", value: "${esc(b.value)}" },`).join('\n');
+          const newBloc = `  {
+    id: ${a.id},
+    titre: "${esc(enrichi.titre)}",
+    sous_titre: "${esc(enrichi.sous_titre)}",
+    coords: [${enrichi.coords[0]}, ${enrichi.coords[1]}],
+    zoom: ${a.zoom || 16},
+    tooltip: "${esc(enrichi.tooltip)}",
+    loyer: ${enrichi.loyer},
+    lien: "${esc(enrichi.lien)}",
+    source: "${esc(enrichi.source)}",
+    badges: [
+${badges}
+    ],
+    particularites: "${esc(enrichi.particularites)}",
+    note: "${esc(enrichi.note)}",
+  },`;
+
+          fileSrc = fileSrc.slice(0, start) + newBloc + fileSrc.slice(end);
+          fs.writeFileSync(ANNONCES, fileSrc);
+
+          details.push({ id: a.id, status: 'ok', message: `${a.titre} — particularites + note mis à jour` });
+          nbOk++;
+          await new Promise(r => setTimeout(r, 300));
+        } catch(e) {
+          details.push({ id: a.id, status: 'erreur', message: e.message });
+          nbErreurs++;
+        }
+      }
+
+      if (nbOk > 0) gitPush('enrichi', `${nbOk} annonces enrichies`).catch(e => console.error('git push échoué :', e.message));
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: nbOk, erreurs: nbErreurs, total: aEnrichir.length, details }));
+    } catch(e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: 0, erreurs: 1, total: 0, details: [{ id: '?', status: 'erreur', message: e.message }] }));
     }
     return;
   }

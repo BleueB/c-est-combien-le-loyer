@@ -142,6 +142,8 @@
   <div id="panelAnnonces" style="display:none">
     <div class="card">
       <h2>Annonces actives</h2>
+      <button class="btn btn-blue" style="margin-bottom:14px" onclick="enrichirAnnonces()">🔄 Enrichir les annonces incomplètes</button>
+      <div id="enrichirLog" style="font-size:0.82rem;line-height:1.8;margin-bottom:12px"></div>
       <div id="annoncesTableWrap">Chargement…</div>
     </div>
   </div>
@@ -308,6 +310,27 @@
       html += `${icon} ${r.url.split('/').pop()} — ${r.message}<br>`;
     }
     log.innerHTML = html;
+    btn.disabled = false;
+  }
+
+  async function enrichirAnnonces() {
+    const log = document.getElementById('enrichirLog');
+    const btn = document.querySelector('#panelAnnonces .btn-blue');
+    btn.disabled = true;
+    log.innerHTML = '⏳ Analyse des annonces incomplètes…';
+    const res = await fetch('/enrichir-annonces', { method: 'POST' });
+    const data = await res.json();
+    if (data.total === 0) {
+      log.innerHTML = '✅ Toutes les annonces sont déjà complètes !';
+    } else {
+      let html = `<strong>${data.ok} enrichies, ${data.erreurs} erreurs sur ${data.total} annonces incomplètes</strong><br>`;
+      for (const r of data.details) {
+        const icon = r.status === 'ok' ? '✅' : '❌';
+        html += `${icon} #${r.id} — ${r.message}<br>`;
+      }
+      log.innerHTML = html;
+      if (data.ok > 0) renderAnnonces();
+    }
     btn.disabled = false;
   }
 
