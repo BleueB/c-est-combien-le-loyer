@@ -433,7 +433,7 @@ const server = http.createServer(async (req, res) => {
         { label: 'Surface',  value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
         { label: 'Pièces',   value: String(d.roomsQuantity || '?') },
         { label: 'Meublé',   value: d.isFurnished === true ? 'Oui' : 'Non' },
-        { label: 'DPE',      value: d.energyClassification && d.energyClassification !== 'NS' ? `${d.energyClassification} · GES ${d.greenhouseGazClassification || '?'}` : 'NS' },
+        { label: 'DPE',      value: d.energyClassification && d.energyClassification !== 'NS' ? d.energyClassification : 'NS' },
         ...(d.hasBalcony  === true ? [{ label: 'Balcon',   value: '✓' }] : []),
         ...(d.hasTerrace  === true ? [{ label: 'Terrasse', value: '✓' }] : []),
         ...((d.hasParking === true || d.enclosedParkingQuantity > 0) ? [{ label: 'Parking', value: '✓' }] : []),
