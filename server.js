@@ -430,13 +430,13 @@ const server = http.createServer(async (req, res) => {
       lien:           url,
       source:         "Bien'ici",
       badges: [
-        { label: 'Surface',  value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
-        { label: 'Pièces',   value: String(d.roomsQuantity || '?') },
-        { label: 'Meublé',   value: d.isFurnished === true ? 'Oui' : 'Non' },
-        { label: 'DPE',      value: d.energyClassification && d.energyClassification !== 'NS' ? d.energyClassification : 'NS' },
-        ...(d.hasBalcony  === true ? [{ label: 'Balcon',   value: '✓' }] : []),
-        ...(d.hasTerrace  === true ? [{ label: 'Terrasse', value: '✓' }] : []),
-        ...((d.hasParking === true || d.enclosedParkingQuantity > 0) ? [{ label: 'Parking', value: '✓' }] : []),
+        { label: 'Surface',   value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
+        { label: 'Pièces',    value: String(d.roomsQuantity || '?') },
+        { label: 'Meublé',    value: d.isFurnished === true ? 'Oui' : 'Non' },
+        { label: 'DPE',       value: d.energyClassification && d.energyClassification !== 'NS' ? d.energyClassification : 'NS' },
+        { label: 'Balcon',    value: d.hasBalcony  === true ? '✓' : '—' },
+        { label: 'Terrasse',  value: d.hasTerrace  === true ? '✓' : '—' },
+        { label: 'Parking',   value: (d.hasParking === true || d.enclosedParkingQuantity > 0 || d.outdoorParkingQuantity > 0) ? '✓' : '—' },
       ],
       particularites: parts.join(' · '),
       note,
@@ -507,9 +507,9 @@ const server = http.createServer(async (req, res) => {
       );
       const annonces = Array.isArray(mod.exports) ? mod.exports : [];
 
-      // Annonces Bien'ici avec particularites ou note vides
+      // Toutes les annonces Bien'ici (re-fetch complet pour corriger DPE, note, particularites)
       const aEnrichir = annonces.filter(a =>
-        a.source === "Bien'ici" && extractBieniciId(a.lien) && (!a.particularites || !a.note)
+        a.source === "Bien'ici" && extractBieniciId(a.lien)
       );
 
       const details = [];
