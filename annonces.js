@@ -5,34 +5,37 @@
 const ANNONCES = [
 
   // --- Jour 1 ---
+
+  /* SUPPRIMÉ jour 1
   {
-    jour: 1,
-    ville: "Nice",
-    titre: "Nice (06000)",
-    sous_titre: "Appartement · Location meublée",
-    coords: [43.685989, 7.237476],
-    zoom: 16,
-    tooltip: "Nice (06000)",
-    loyer: 1500,
-    lien: "https://www.pap.fr/annonces/appartement-nice-06000-r465302794",
-    source: "PAP",
-    badges: [
-      { label: "Surface", value: "38 m²" },
-      { label: "Pièces", value: "2 pièces · 1 ch." },
-      { label: "Étage", value: "1e · sans ascenseur" },
-      { label: "Meublé", value: "✅ Oui" },
-      { label: "Parking", value: "❌ Non" },
-      { label: "Extérieur", value: "❌ Aucun" },
-      { label: "Année construction", value: "Non communiquée" },
-      { label: "État", value: "Entretenu" },
-      { label: "DPE", value: "Non communiqué" },
-      { label: "Chauffage", value: "Non communiqué" },
-      { label: "Exposition", value: "Non communiquée" },
-      { label: "Transports", value: "Non communiqué" },
-    ],
-    particularites: "🏠 Cave · 🛋️ Meublé · ❄️ Climatisation",
-    note: "1e étage · 38 m² · 1 chambre",
-  },
+      jour: 1,
+      ville: "Nice",
+      titre: "Nice (06000)",
+      sous_titre: "Appartement · Location meublée",
+      coords: [43.685989, 7.237476],
+      zoom: 16,
+      tooltip: "Nice (06000)",
+      loyer: 1500,
+      lien: "https://www.pap.fr/annonces/appartement-nice-06000-r465302794",
+      source: "PAP",
+      badges: [
+        { label: "Surface", value: "38 m²" },
+        { label: "Pièces", value: "2 pièces · 1 ch." },
+        { label: "Étage", value: "1e · sans ascenseur" },
+        { label: "Meublé", value: "✅ Oui" },
+        { label: "Parking", value: "❌ Non" },
+        { label: "Extérieur", value: "❌ Aucun" },
+        { label: "Année construction", value: "Non communiquée" },
+        { label: "État", value: "Entretenu" },
+        { label: "DPE", value: "Non communiqué" },
+        { label: "Chauffage", value: "Non communiqué" },
+        { label: "Exposition", value: "Non communiquée" },
+        { label: "Transports", value: "Non communiqué" },
+      ],
+      particularites: "🏠 Cave · 🛋️ Meublé · ❄️ Climatisation",
+      note: "1e étage · 38 m² · 1 chambre",
+    },
+  */
 
   /* SUPPRIMÉ jour 1
   {
