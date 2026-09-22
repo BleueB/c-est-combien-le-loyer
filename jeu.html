@@ -334,7 +334,7 @@
   }
 
   function partagerRecap(total, max, emojis) {
-    const lien = 'https://bleub.github.io/c-est-combien-ton-loyer';
+    const lien = 'https://bleueb.github.io/c-est-combien-ton-loyer/';
     const texte = `🏠 C'est Combien Ton Loyer ? — Partie #${numJour}\n${emojis}\n${total} / ${max} pts\n${lien}`;
     if (typeof umami !== 'undefined') umami.track('score-partage', { score: total, jour: numJour });
     if (navigator.share) {
