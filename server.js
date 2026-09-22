@@ -95,6 +95,11 @@ function nextId() {
 function appendAnnonce(annonce) {
   const src = fs.readFileSync(ANNONCES, 'utf8');
 
+  // Lien obligatoire
+  if (!annonce.lien) {
+    throw new Error('Le lien de l\'annonce est obligatoire');
+  }
+
   // Vérifier doublon sur le lien (on normalise en retirant les query params)
   if (annonce.lien) {
     const lienBase = annonce.lien.split('?')[0].replace(/\/$/, '');
@@ -147,6 +152,24 @@ function esc(s) {
   return String(s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
+function gitPush(id, titre) {
+  return new Promise((resolve, reject) => {
+    const msg = `Annonce #${id} — ${titre}`;
+    // git add annonces.js && git commit -m "..." && git push
+    execFile('git', ['add', 'annonces.js'], { cwd: ROOT }, (err) => {
+      if (err) return reject(new Error('git add : ' + err.message));
+      execFile('git', ['commit', '-m', msg], { cwd: ROOT }, (err) => {
+        if (err) return reject(new Error('git commit : ' + err.message));
+        execFile('git', ['push'], { cwd: ROOT }, (err, stdout, stderr) => {
+          if (err) return reject(new Error('git push : ' + err.message));
+          console.log(`✅ git push — ${msg}`);
+          resolve();
+        });
+      });
+    });
+  });
+}
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -165,6 +188,79 @@ function serveFile(res, filePath) {
   });
 }
 
+// ── contrôles de cohérence ────────────────────────────────────────────────────
+
+function fetchJSON(url) {
+  return new Promise((resolve, reject) => {
+    const https = require('https');
+    https.get(url, { headers: { 'User-Agent': 'CCTL-check/1.0' } }, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { reject(e); } });
+    }).on('error', reject);
+  });
+}
+
+function extractBieniciId(lien) {
+  const m = (lien || '').match(/bienici\.com\/annonce\/[^/]+\/[^/]+\/[^/]+\/[^/]+\/([^/?#]+)/);
+  return m ? m[1] : null;
+}
+
+async function controlerCoherence(annonce) {
+  const alertes = [];
+
+  // 1. Vérifier via API Bien'ici
+  const bieniciId = extractBieniciId(annonce.lien);
+  if (bieniciId) {
+    try {
+      const d = await fetchJSON(`https://www.bienici.com/realEstateAd.json?id=${bieniciId}`);
+      if (d.adType && d.adType !== 'rent')
+        alertes.push(`⚠️ Type d'annonce : "${d.adType}" — ce n'est pas une location !`);
+      if (d.status?.onTheMarket === false)
+        alertes.push(`⚠️ Annonce retirée du marché sur Bien'ici`);
+      if (d.price && Math.abs(d.price - annonce.loyer) > 50)
+        alertes.push(`⚠️ Loyer : local=${annonce.loyer}€ mais API=${d.price}€`);
+    } catch(e) {
+      alertes.push(`⚠️ Impossible de vérifier via Bien'ici : ${e.message}`);
+    }
+  }
+
+  // 2. Vérifier cohérence GPS / titre via Nominatim
+  if (annonce.coords && annonce.titre) {
+    // Extraire le quartier du titre (avant la virgule)
+    const quartier = annonce.titre.split(',')[0].trim();
+    try {
+      const results = await fetchJSON(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(quartier + ' Nice France')}&format=json&limit=1`
+      );
+      if (results.length) {
+        const nlat = parseFloat(results[0].lat);
+        const nlon = parseFloat(results[0].lon);
+        const [alat, alon] = annonce.coords;
+        // Distance approximative en km (formule simplifiée)
+        const dist = Math.sqrt(Math.pow((nlat - alat) * 111, 2) + Math.pow((nlon - alon) * 73, 2));
+        if (dist > 3) {
+          alertes.push(`⚠️ GPS suspect : les coords semblent à ${dist.toFixed(1)}km du quartier "${quartier}" selon Nominatim (${nlat.toFixed(4)}, ${nlon.toFixed(4)})`);
+        }
+      }
+    } catch(e) { /* Nominatim indisponible, on ignore */ }
+  }
+
+  // 3. Vérifier que la note ne mentionne pas un quartier incohérent
+  if (annonce.note && annonce.titre) {
+    const quartiersConnus = ['Rossetti', 'Californie', 'Musicien', 'Carabacel', 'Cimiez', 'Libération'];
+    const quartierTitre = annonce.titre.split(',')[0].toLowerCase();
+    for (const q of quartiersConnus) {
+      if (annonce.note.toLowerCase().includes(q.toLowerCase()) &&
+          !quartierTitre.includes(q.toLowerCase())) {
+        alertes.push(`⚠️ La note mentionne "${q}" mais le titre indique "${annonce.titre.split(',')[0]}" — note peut-être copiée d'une autre annonce`);
+      }
+    }
+  }
+
+  return alertes;
+}
+
 // ── serveur ───────────────────────────────────────────────────────────────────
 
 const server = http.createServer(async (req, res) => {
@@ -173,6 +269,56 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+  // GET /check-lien?url=...
+  if (req.method === 'GET' && req.url.startsWith('/check-lien')) {
+    const url = new URL('http://localhost' + req.url).searchParams.get('url');
+    if (!url) { res.writeHead(400); res.end('{}'); return; }
+    try {
+      const https = require('https');
+      const http2 = require('http');
+      const parsed = new URL(url);
+      const lib = parsed.protocol === 'https:' ? https : http2;
+
+      // Pour Bien'ici → appel API direct
+      const bieniciId = extractBieniciId(url);
+      if (bieniciId) {
+        const d = await fetchJSON(`https://www.bienici.com/realEstateAd.json?id=${bieniciId}`);
+        const online = d.adType === 'rent' && d.status?.onTheMarket !== false && d.price > 0;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, online }));
+        return;
+      }
+
+      // Pour les autres (SeLoger, PAP…) → non vérifiable fiablement, à vérifier manuellement
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, online: null }));
+    } catch(e) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, online: false }));
+    }
+    return;
+  }
+
+  // GET /list-annonces
+  if (req.method === 'GET' && req.url === '/list-annonces') {
+    try {
+      const src = fs.readFileSync(ANNONCES, 'utf8');
+      const vm  = require('vm');
+      const mod = { exports: {} };
+      vm.runInNewContext(
+        `(function(module){ ${src.replace('const ANNONCES =', 'module.exports =')} })(module)`,
+        { module: mod }
+      );
+      const annonces = Array.isArray(mod.exports) ? mod.exports : [];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(annonces));
+    } catch(e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
 
   // POST /save-annonce
   if (req.method === 'POST' && req.url === '/save-annonce') {

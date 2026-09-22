@@ -74,12 +74,36 @@
       margin-bottom: 16px; line-height: 1.6;
     }
     .sep { border: none; border-top: 1px solid #e5e7eb; margin: 14px 0; }
-    .source-badge {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
-      font-size: 0.78rem; font-weight: 700; margin-bottom: 12px;
+
+    .tab-btn {
+      padding: 8px 18px; font-size: 0.88rem; font-weight: 700;
+      border: 1.5px solid #e5e7eb; border-radius: 8px; background: #fff;
+      cursor: pointer; color: #57606a; transition: all 0.15s;
     }
-    .source-bienici { background: #fef9c3; color: #854d0e; }
-    .source-other   { background: #f3f4f6; color: #374151; }
+    .tab-btn.active { background: #1f2328; color: #fff; border-color: #1f2328; }
+    .tab-btn:hover:not(.active) { background: #f7f8fa; }
+
+    .annonces-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .annonces-table th {
+      text-align: left; padding: 8px 10px; font-size: 0.72rem; font-weight: 700;
+      color: #57606a; text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .annonces-table td { padding: 9px 10px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+    .annonces-table tr:hover td { background: #f7f8fa; }
+    .badge-source {
+      display: inline-block; padding: 2px 7px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700;
+    }
+    .s-bienici { background: #fef9c3; color: #854d0e; }
+    .s-seloger  { background: #dbeafe; color: #1d4ed8; }
+    .s-pap      { background: #f3e8ff; color: #7c3aed; }
+    .s-other    { background: #f3f4f6; color: #374151; }
+    .lien-btn {
+      font-size: 0.75rem; color: #3b82d4; text-decoration: none;
+      border: 1px solid #3b82d4; border-radius: 5px; padding: 2px 7px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -88,6 +112,22 @@
   <h1>🏠 Ajouter une annonce</h1>
   <p class="subtitle">Bien'ici : lien suffit · Autres sites : remplis le formulaire</p>
 
+  <!-- ONGLETS -->
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button class="tab-btn active" id="tabAjouter" onclick="switchTab('ajouter')">➕ Ajouter</button>
+    <button class="tab-btn" id="tabAnnonces" onclick="switchTab('annonces')">📋 Mes annonces</button>
+  </div>
+
+  <!-- PANNEAU MES ANNONCES -->
+  <div id="panelAnnonces" style="display:none">
+    <div class="card">
+      <h2>Annonces actives</h2>
+      <div id="annoncesTableWrap">Chargement…</div>
+    </div>
+  </div>
+
+  <!-- PANNEAU AJOUTER -->
+  <div id="panelAjouter">
   <div class="instructions" id="instructions">
     📋 <strong>Mode d'emploi :</strong> Lance <code>node server.js</code> dans le dossier, puis ouvre <strong>http://localhost:3000/admin.html</strong>. Colle un lien Bien'ici pour import automatique, ou remplis le formulaire pour les autres sites.
   </div>
@@ -209,9 +249,79 @@
     <button class="btn btn-blue" onclick="geocoderSiVide()">📍 Géocoder →</button>
     <button class="btn btn-green" id="btnSave" onclick="sauvegarder()">💾 Sauvegarder dans annonces.js</button>
   </div>
+  </div><!-- fin panelAjouter -->
 
 </div>
 <script>
+  // ── onglets ───────────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('panelAjouter').style.display  = tab === 'ajouter'  ? '' : 'none';
+    document.getElementById('panelAnnonces').style.display = tab === 'annonces' ? '' : 'none';
+    document.getElementById('tabAjouter').classList.toggle('active',  tab === 'ajouter');
+    document.getElementById('tabAnnonces').classList.toggle('active', tab === 'annonces');
+    if (tab === 'annonces') renderAnnonces();
+  }
+
+  function renderAnnonces() {
+    fetch('/list-annonces')
+      .then(r => r.json())
+      .then(annonces => {
+        if (!annonces.length) {
+          document.getElementById('annoncesTableWrap').innerHTML = '<p style="color:#57606a;font-size:0.85rem">Aucune annonce active.</p>';
+          return;
+        }
+       const sourceCls = s => s === "Bien'ici" ? 's-bienici' : s === 'SeLoger' ? 's-seloger' : s === 'PAP' ? 's-pap' : 's-other';
+        const rows = annonces.map(a => {
+          const surface = (a.badges?.find(b => b.label === 'Surface')?.value || '—');
+          const meuble  = (a.badges?.find(b => b.label === 'Meublé')?.value || '—');
+          const rowId   = `row-${a.id}`;
+          return `<tr id="${rowId}">
+            <td><strong>#${a.id}</strong></td>
+            <td>${a.titre}</td>
+            <td>${surface}</td>
+            <td><strong>${a.loyer.toLocaleString('fr-FR')} €</strong></td>
+            <td>${meuble}</td>
+            <td><span class="badge-source ${sourceCls(a.source)}">${a.source}</span></td>
+            <td>${a.lien ? `<a href="${a.lien}" target="_blank" class="lien-btn">Voir →</a>` : '—'}</td>
+            <td id="status-${a.id}" style="font-size:0.78rem;color:#adb5bd">⏳</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('annoncesTableWrap').innerHTML = `
+          <p style="font-size:0.82rem;color:#57606a;margin-bottom:10px">${annonces.length} annonce${annonces.length>1?'s':''} active${annonces.length>1?'s':''}</p>
+          <div style="overflow-x:auto">
+          <table class="annonces-table">
+            <thead><tr>
+              <th>#</th><th>Titre</th><th>Surface</th><th>Loyer CC</th><th>Meublé</th><th>Source</th><th>Lien</th><th>Statut</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          </div>`;
+        // Vérifier le statut de chaque annonce en arrière-plan (avec délai pour ne pas spammer)
+        annonces.forEach((a, i) => setTimeout(() => verifierStatut(a), i * 400));
+      })
+      .catch(() => {
+        document.getElementById('annoncesTableWrap').innerHTML = '<p style="color:#dc2626">Erreur de chargement — le serveur tourne-t-il ?</p>';
+      });
+  }
+
+  async function verifierStatut(a) {
+    const el = document.getElementById('status-' + a.id);
+    if (!el || !a.lien) { if (el) el.textContent = '—'; return; }
+    try {
+      const r = await fetch('/check-lien?url=' + encodeURIComponent(a.lien));
+      const d = await r.json();
+      if (d.online === true) {
+        el.innerHTML = '<span style="color:#16a34a">✅ En ligne</span>';
+      } else if (d.online === false) {
+        el.innerHTML = '<span style="color:#dc2626">❌ Expirée</span>';
+      } else {
+        el.innerHTML = '<span style="color:#d97706">⚠️ À vérifier</span>';
+      }
+    } catch(e) {
+      el.innerHTML = '<span style="color:#adb5bd">? Injoignable</span>';
+    }
+  }
+
   let _lastAnnonce = null;
 
   function makeNote(raw) {

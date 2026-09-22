@@ -256,18 +256,38 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 13px;
-      border: 1.5px solid #3b82d4;
+      gap: 10px;
+      padding: 12px 18px;
       border-radius: 10px;
-      color: #3b82d4;
       font-weight: 700;
       text-decoration: none;
       font-size: 0.95rem;
       margin-bottom: 10px;
-      transition: background 0.15s;
+      transition: opacity 0.15s;
+      background: #fff;
+      border: 2px solid transparent;
     }
-    .btn-annonce:hover { background: #eff6ff; }
+    .btn-annonce:hover { opacity: 0.75; }
+
+    /* Badges par plateforme */
+    .btn-annonce.source-sl  { color: #e31937; border-color: #e31937; }
+    .btn-annonce.source-bi  { color: #f5a623; border-color: #f5a623; }
+    .btn-annonce.source-pap { color: #1a5fa8; border-color: #1a5fa8; }
+    .btn-annonce.source-lbc { color: #ff6e14; border-color: #ff6e14; }
+    .btn-annonce.source-def { color: #3b82d4; border-color: #3b82d4; }
+
+    .badge-source {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 2px solid currentColor;
+      line-height: 1.4;
+    }
 
     .btn-partager {
       width: 100%;
@@ -378,7 +398,7 @@
 
 <header>
   <h1>🏠 C'est Combien Ton Loyer ?</h1>
-  <p>Devinez le loyer de l'annonce du jour — charges comprises</p>
+  <p>Combien coûte vraiment cet appart ? — charges comprises</p>
 </header>
 
 <div class="card" id="card">
@@ -432,6 +452,26 @@
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  }
+
+  // --- SOURCE BADGE ---
+  function sourceAbbrev(source) {
+    if (!source) return '?';
+    const s = source.toLowerCase();
+    if (s.includes('seloger'))   return 'SL';
+    if (s.includes('bien'))      return 'BI';
+    if (s.includes('pap'))       return 'PAP';
+    if (s.includes('bonCoin') || s.includes('leboncoin') || s.includes('lbc')) return 'LBC';
+    return source.slice(0, 3).toUpperCase();
+  }
+  function sourceCssClass(source) {
+    if (!source) return 'source-def';
+    const s = source.toLowerCase();
+    if (s.includes('seloger'))   return 'source-sl';
+    if (s.includes('bien'))      return 'source-bi';
+    if (s.includes('pap'))       return 'source-pap';
+    if (s.includes('boncoin') || s.includes('leboncoin') || s.includes('lbc')) return 'source-lbc';
+    return 'source-def';
   }
 
   // --- RENDER ---
@@ -496,9 +536,10 @@
           <div class="precision-label">Précision</div>
           <div class="precision-bg"><div class="precision-fill" id="precisionFill"></div></div>
         </div>
-        <a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce">
-          🔗 Voir la vraie annonce ${a.source}
-        </a>
+        ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}">
+          <span class="badge-source">${sourceAbbrev(a.source)}</span>
+          Voir l'annonce
+        </a>` : ''}
         <button class="btn-suivante" id="btnSuivante" style="display:none" onclick="goTo(currentIndex + 1)">
           Annonce suivante →
         </button>
@@ -515,11 +556,11 @@
   // --- RÉCAP ---
   function getVerdictGlobal(total, max) {
     const pct = total / max;
-    if (pct >= 0.9) return { emoji: '🏆', text: 'Expert du marché niçois !', sub: pick(['Vous pouvez ouvrir votre agence.', 'Ben Arfa vous recruterait comme scout immo.', 'Uno di noi ! Uno di noi !']) };
+    if (pct >= 0.9) return { emoji: '🏆', text: 'Expert du marché niçois !', sub: pick(['Vous pouvez ouvrir votre agence.', 'Uno di noi ! Uno di noi !', 'On ne vous la fait pas.']) };
     if (pct >= 0.7) return { emoji: '🌟', text: 'Très bon score !', sub: pick(['Vous sentez le marché.', 'Quelques loyers vous ont résisté, mais pas beaucoup.', 'Les agences niçoises tremblent.']) };
-    if (pct >= 0.5) return { emoji: '🙂', text: 'Pas mal du tout !', sub: pick(['Nice ne vous a pas totalement roulé dans la farine.', 'Encore quelques parties et vous serez imbattable.', 'Dans la moyenne, c\'est déjà ça !']) };
+    if (pct >= 0.5) return { emoji: '🙂', text: 'Pas mal du tout !', sub: pick(['Vous commencez à sentir le marché.', 'Ni agent immo, ni touriste — quelque part entre les deux.', 'Nice vous résiste encore un peu.', 'Dans la moyenne, c\'est déjà ça !']) };
     if (pct >= 0.3) return { emoji: '😬', text: 'Peut mieux faire…', sub: pick(['Nice vous a bien eu.', 'Le marché niçois garde ses secrets.', 'Fada ? Peut-être un peu, oui.']) };
-    return { emoji: '💸', text: 'Aïe aïe aïe !', sub: pick(['Vous cherchez vraiment à Limoges ?', 'Tu n\'es pas un vrai Nissart !', 'Le marché niçois n\'a fait qu\'une bouchée de vous.']) };
+    return { emoji: '💸', text: 'Aïe aïe aïe !', sub: pick(['Tu débarques de Paris ?', 'En vacances dans la région, peut-être ?', 'Tu n\'es pas un vrai Nissart !', 'Le marché niçois n\'a fait qu\'une bouchée de vous.']) };
   }
 
   function afficherRecap() {
@@ -536,10 +577,9 @@
           <span style="display:flex;align-items:center;gap:10px">
             <span class="rv">${r.score} pts</span>
             <span class="rv ${col}" style="font-size:0.8rem">${ecartStr}</span>
-            <a href="${r.annonce.lien}" target="_blank" rel="noopener"
-               style="color:#3b82d4;font-size:0.8rem;font-weight:700;text-decoration:none;border:1px solid #3b82d4;border-radius:6px;padding:2px 8px;white-space:nowrap">
-              Voir →
-            </a>
+            ${r.annonce.lien ? `<a href="${r.annonce.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(r.annonce.source)}" style="margin:0;padding:3px 9px;font-size:0.75rem;border-width:1.5px;white-space:nowrap">
+              <span class="badge-source" style="font-size:0.65rem;padding:1px 5px">${sourceAbbrev(r.annonce.source)}</span>
+            </a>` : ''}
           </span>
         </div>`;
     }).join('');
@@ -574,16 +614,32 @@
       zoomControl: true, scrollWheelZoom: false,
       dragging: true, attributionControl: false
     }).setView(a.coords, a.zoom);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
-    L.control.attribution({ prefix: '© Esri' }).addTo(map);
+    L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(map);
     const pinIcon = L.divIcon({
       html: '<div style="background:#3b82d4;width:13px;height:13px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4)"></div>',
       className: '', iconSize: [13,13], iconAnchor: [6,6]
     });
     L.marker(a.coords, { icon: pinIcon }).addTo(map)
       .bindTooltip(a.tooltip, { permanent: true, direction: 'top', offset: [0,-10] });
+
+    // Bouton de recentrage
+    const ResetControl = L.Control.extend({
+      options: { position: 'topright' },
+      onAdd: () => {
+        const btn = L.DomUtil.create('button');
+        btn.title = 'Recentrer';
+        btn.innerHTML = '⌖';
+        btn.style.cssText = 'background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;width:30px;height:30px;font-size:1.1rem;cursor:pointer;line-height:1;color:#444;';
+        btn.onmouseover = () => btn.style.background = '#f4f4f4';
+        btn.onmouseout  = () => btn.style.background = '#fff';
+        L.DomEvent.on(btn, 'click', () => map.setView(a.coords, a.zoom));
+        return btn;
+      }
+    });
+    map.addControl(new ResetControl());
   }
 
   // --- SLIDER ---
@@ -614,28 +670,28 @@
   function getVerdict(score) {
     if (score >= 900) return {
       emoji: '🎯',
-      text: pick(['Parfait !', 'En feu comme Ben Arfa !', 'Uno di noi !']),
-      sub: pick(['Vous connaissez ce marché sur le bout des doigts.', 'Agent immobilier en secret ?', 'Vous auriez fait une offre sans hésiter.', 'Même les agences vous embaucheraient.'])
+      text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Uno di noi !']),
+      sub: pick(['Vrai expert immo ou vrai coup de chance ?', 'J\'en connais un qui tient les comptes.', 'On ne te la fait pas, à toi.', 'Vous connaissez ce marché sur le bout des doigts.', 'Agent immobilier en secret ?'])
     };
     if (score >= 700) return {
       emoji: '🔥',
-      text: pick(['Très proche !', 'Vous avez l\'œil !']),
-      sub: pick(['Excellent sens du marché.', 'Vous sentez le marché de la Côte d\'Azur.', '50 € près, c\'est presque du sans-faute.'])
+      text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !']),
+      sub: pick(['Vous êtes du coin ?', 'Vous êtes déjà passé dans le quartier, n\'est-ce pas ?', 'Excellent sens du marché.', 'Vous sentez le marché de la Côte d\'Azur.'])
     };
     if (score >= 450) return {
       emoji: '👍',
-      text: pick(['Pas mal !', 'Dans la bonne fourchette !']),
-      sub: pick(['Vous vous en sortez bien.', 'Pas agent immo, mais pas loin.', 'Vous vous défendez bien !'])
+      text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']),
+      sub: pick(['Tu n\'es pas du coin, n\'est-ce pas ?', 'Tu viens du Var ?', 'Vous vous défendez bien !'])
     };
     if (score >= 150) return {
       emoji: '😅',
-      text: 'Raté…',
-      sub: pick(['Mèfi ne te mérite pas !', 'Le marché vous a eu cette fois !', 'Nice vous a bien roulé dans la farine.', 'Le propriétaire aurait adoré votre offre.'])
+      text: 'Ouch !',
+      sub: pick(['Combien coûte un pain au chocolat ?', 'Le marché vous a eu cette fois !', 'Nice vous a bien roulé dans la farine.', 'Mèfi ne te mérite pas !'])
     };
     return {
       emoji: '💸',
       text: 'Aïe !',
-      sub: pick(['Fada !', 'Tu n\'es pas un vrai Nissart !', 'Le marché n\'a pas fini de vous surprendre.', 'C\'est ça, la Côte d\'Azur.', 'Vous cherchez plutôt à Limoges ?'])
+      sub: pick(['Une vision d\'aigle… je crois que Mèfi est de la partie.', 'Fada !', 'Tu n\'es pas un vrai Nissart !', 'Le marché n\'a pas fini de vous surprendre.', 'C\'est ça, la Côte d\'Azur.'])
     };
   }
 

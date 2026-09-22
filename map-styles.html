@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comparaison styles de carte</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; background: #f0f2f5; padding: 20px; color: #1f2328; }
+    h1 { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; }
+    p  { font-size: 0.83rem; color: #57606a; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+    .map  { height: 220px; }
+    .info { padding: 12px 14px; }
+    .name { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+    .desc { font-size: 0.78rem; color: #57606a; }
+    .tag  { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 1px 6px;
+            border-radius: 10px; margin-top: 4px; }
+    .tag-poi   { background: #dcfce7; color: #15803d; }
+    .tag-sat   { background: #dbeafe; color: #1d4ed8; }
+    .tag-plan  { background: #f3f4f6; color: #374151; }
+    .tag-dark  { background: #1f2328; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>🗺️ Styles de carte disponibles</h1>
+  <p>Coordonnées test : Carabacel, Nice · Clic droit sur une carte pour voir les coordonnées</p>
+  <div class="grid" id="grid"></div>
+
+<script>
+const LAT = 43.7012, LNG = 7.2760, ZOOM = 17;
+
+const STYLES = [
+  {
+    name: "Esri Satellite",
+    desc: "Vue aérienne haute résolution — style actuel du jeu",
+    tag: "sat",
+    tagLabel: "Satellite",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attr: "© Esri",
+    maxZoom: 19,
+  },
+  {
+    name: "Esri Streets (avec commerces)",
+    desc: "Plan détaillé avec commerces, restaurants, transports",
+    tag: "poi",
+    tagLabel: "✅ POI commerces",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    attr: "© Esri",
+    maxZoom: 19,
+  },
+  {
+    name: "Esri Navigation",
+    desc: "Plan orienté transport, rues claires",
+    tag: "plan",
+    tagLabel: "Plan",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Navigation_Charts/MapServer/tile/{z}/{y}/{x}",
+    attr: "© Esri",
+    maxZoom: 14,
+  },
+  {
+    name: "Esri Topo",
+    desc: "Carte topographique avec relief et quartiers",
+    tag: "plan",
+    tagLabel: "Plan",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    attr: "© Esri",
+    maxZoom: 19,
+  },
+  {
+    name: "CartoDB Positron",
+    desc: "Plan minimaliste clair, très lisible",
+    tag: "plan",
+    tagLabel: "Plan",
+    url: "https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    attr: "© OpenStreetMap",
+    maxZoom: 19,
+  },
+  {
+    name: "OpenStreetMap Standard",
+    desc: "Plan OSM complet avec commerces et POI",
+    tag: "poi",
+    tagLabel: "✅ POI commerces",
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attr: "© OpenStreetMap",
+    maxZoom: 19,
+  },
+  {
+    name: "OpenStreetMap France",
+    desc: "OSM rendu France — très détaillé, boulangeries, pharmacies…",
+    tag: "poi",
+    tagLabel: "✅ POI détaillés",
+    url: "https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+    attr: "© OpenStreetMap France",
+    maxZoom: 20,
+  },
+  {
+    name: "Stadia Alidade Smooth",
+    desc: "Plan moderne épuré avec quartiers colorés",
+    tag: "plan",
+    tagLabel: "Plan",
+    url: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png",
+    attr: "© Stadia Maps",
+    maxZoom: 20,
+  },
+  {
+    name: "Stadia Dark",
+    desc: "Fond sombre — contraste fort, élégant",
+    tag: "dark",
+    tagLabel: "🌙 Dark",
+    url: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png",
+    attr: "© Stadia Maps",
+    maxZoom: 20,
+  },
+];
+
+const grid = document.getElementById('grid');
+
+STYLES.forEach((s, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="map" id="map-${i}"></div>
+    <div class="info">
+      <div class="name">${s.name}</div>
+      <div class="desc">${s.desc}</div>
+      <span class="tag tag-${s.tag}">${s.tagLabel}</span>
+    </div>`;
+  grid.appendChild(card);
+
+  setTimeout(() => {
+    const map = L.map(`map-${i}`, {
+      zoomControl: false, scrollWheelZoom: false,
+      dragging: false, attributionControl: false
+    }).setView([LAT, LNG], ZOOM);
+    L.tileLayer(s.url, { maxZoom: s.maxZoom, attribution: s.attr }).addTo(map);
+    const pin = L.divIcon({
+      html: '<div style="background:#3b82d4;width:12px;height:12px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>',
+      className: '', iconSize: [12,12], iconAnchor: [6,6]
+    });
+    L.marker([LAT, LNG], { icon: pin }).addTo(map);
+  }, i * 200);
+});
+</script>
+</body>
+</html>
