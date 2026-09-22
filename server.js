@@ -406,10 +406,19 @@ const server = http.createServer(async (req, res) => {
     if (d.exposition)             parts.push(`Exposition : ${d.exposition}`);
     if (d.charges > 0)            parts.push(`Charges : ${d.charges}€/mois`);
 
-    // Note : extrait les 2 premières phrases de la description
-    const desc = (d.description || '').replace(/<[^>]+>/g, '').trim();
-    const sentences = desc.split(/(?<=[.!?])\s+/);
-    const note = sentences.slice(0, 2).join(' ').slice(0, 200);
+    // Note factuelle construite depuis les données structurées (pas de copier-coller d'agence)
+    const noteParts = [];
+    if (d.floor > 0) noteParts.push(`${d.floor}e étage`);
+    else if (d.floor === 0) noteParts.push('Rez-de-chaussée');
+    if (d.surfaceArea) noteParts.push(`${d.surfaceArea} m²`);
+    if (d.bedroomsQuantity > 0) noteParts.push(`${d.bedroomsQuantity} chambre${d.bedroomsQuantity > 1 ? 's' : ''}`);
+    if (d.exposition) noteParts.push(`exposition ${d.exposition.toLowerCase()}`);
+    if (d.yearOfConstruction) noteParts.push(`immeuble ${d.yearOfConstruction}`);
+    // Chercher mentions de transports dans la description sans reprendre le baratin
+    const descRaw = (d.description || '').replace(/<[^>]+>/g, '');
+    const tramMatch = descRaw.match(/tram(?:way)?\s+[A-Z0-9]+/i);
+    if (tramMatch) noteParts.push(`🚋 ${tramMatch[0]}`);
+    const note = noteParts.join(' · ');
 
     return {
       titre:          `${d.district?.libelle || d.city || 'Nice'}, ${d.roomsQuantity || '?'}p · ${d.surfaceArea || '?'}m²`,
