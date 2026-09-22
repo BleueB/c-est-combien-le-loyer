@@ -785,6 +785,7 @@
 
   // --- REJOUER ---
   function rejouer() {
+    if (typeof umami !== 'undefined') umami.track('rejouer');
     marquerVus(ordre.map(i => ANNONCES[i].id));
     ordre = piocherOrdre();
     scores = [];
