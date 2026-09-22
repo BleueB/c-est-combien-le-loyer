@@ -578,7 +578,7 @@
             <span class="rv">${r.score} pts</span>
             <span class="rv ${col}" style="font-size:0.8rem">${ecartStr}</span>
             ${r.annonce.lien ? `<a href="${r.annonce.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(r.annonce.source)}" style="margin:0;padding:3px 9px;font-size:0.75rem;border-width:1.5px;white-space:nowrap">
-              <span class="badge-source" style="font-size:0.65rem;padding:1px 5px">${sourceAbbrev(r.annonce.source)}</span>
+              <span class="badge-source" style="font-size:0.65rem;padding:1px 5px">${sourceAbbrev(r.annonce.source)}</span> →
             </a>` : ''}
           </span>
         </div>`;
@@ -603,9 +603,19 @@
   }
 
   function partagerRecap(total, max) {
-    const texte = `🏠 C'est Combien Ton Loyer ?\nScore total : ${total} / ${max} pts sur ${NB_MANCHES} manches\nEssayez vous aussi !`;
-    if (navigator.share) navigator.share({ title: "C'est Combien Ton Loyer ?", text: texte });
-    else if (navigator.clipboard) navigator.clipboard.writeText(texte).then(() => alert('Score copié !'));
+    const lien = 'https://cest-combien-ton-loyer.netlify.app';
+    const texte = `🏠 J'ai fait ${total} points à "C'est combien ton loyer ?" — t'arrives à me battre ?\n${lien}`;
+    if (navigator.share) {
+      navigator.share({ title: "C'est Combien Ton Loyer ?", text: texte }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(texte).then(() => {
+        const btn = document.querySelector('.btn-partager');
+        const original = btn.innerHTML;
+        btn.innerHTML = '✅ Score copié !';
+        btn.disabled = true;
+        setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2500);
+      });
+    }
   }
 
   // --- MAP ---
