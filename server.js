@@ -337,6 +337,95 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // POST /import-masse
+  if (req.method === 'POST' && req.url === '/import-masse') {
+    try {
+      const body = await readBody(req);
+      const { urls } = JSON.parse(body);
+      if (!Array.isArray(urls)) throw new Error('urls doit être un tableau');
+
+      const details = [];
+      let nbOk = 0, nbDoublons = 0, nbErreurs = 0;
+
+      // Traitement séquentiel pour éviter de surcharger l'API Bien'ici
+      for (const url of urls) {
+        const bieniciId = extractBieniciId(url);
+        if (!bieniciId) {
+          details.push({ url, status: 'erreur', message: 'URL non reconnue' });
+          nbErreurs++; continue;
+        }
+
+        // Vérifier doublon avant fetch
+        const src = fs.readFileSync(ANNONCES, 'utf8');
+        const lienBase = url.split('?')[0].replace(/\/$/, '');
+        const liens = [...src.matchAll(/lien:\s*"([^"]+)"/g)].map(m => m[1].split('?')[0].replace(/\/$/, ''));
+        if (liens.includes(lienBase)) {
+          details.push({ url, status: 'doublon', message: 'Déjà dans la base' });
+          nbDoublons++; continue;
+        }
+
+        try {
+          const d = await fetchJSON(`https://www.bienici.com/realEstateAd.json?id=${bieniciId}`);
+
+          if (!d || !d.price || d.price <= 0)              { details.push({ url, status: 'erreur', message: 'Prix manquant ou invalide' }); nbErreurs++; continue; }
+          if (d.adType !== 'rent')                          { details.push({ url, status: 'erreur', message: `Type "${d.adType}" — pas une location` }); nbErreurs++; continue; }
+          if (d.status?.onTheMarket === false)               { details.push({ url, status: 'erreur', message: 'Annonce retirée du marché' }); nbErreurs++; continue; }
+
+          // Coordonnées
+          const pos = d.blurInfo?.position || d.blurInfo;
+          const lat = pos?.lat, lng = pos?.lon;
+          if (!lat || !lng)                                  { details.push({ url, status: 'erreur', message: 'Coordonnées GPS manquantes' }); nbErreurs++; continue; }
+
+          // Construire l'annonce
+          const annonce = {
+            titre:       `${d.district?.libelle || d.city || 'Nice'}, ${d.roomsQuantity || '?'}p · ${d.surfaceArea || '?'}m²`,
+            sous_titre:  `${d.city || 'Nice'} · ${d.postalCode || ''}`,
+            coords:      [parseFloat(lat.toFixed(5)), parseFloat(lng.toFixed(5))],
+            zoom:        16,
+            tooltip:     `${d.district?.libelle || d.city || 'Nice'}`,
+            loyer:       Math.round(d.price),
+            lien:        url,
+            source:      "Bien'ici",
+            badges: [
+              { label: 'Surface',  value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
+              { label: 'Pièces',   value: String(d.roomsQuantity || '?') },
+              { label: 'Meublé',   value: d.isFurnished === true ? 'Oui' : 'Non' },
+              { label: 'DPE',      value: d.energyClassification || 'NS' },
+              ...(d.hasBalcony    === true ? [{ label: 'Balcon',   value: '✓' }] : []),
+              ...(d.hasTerrace    === true ? [{ label: 'Terrasse', value: '✓' }] : []),
+              ...(d.hasParking    === true ? [{ label: 'Parking',  value: '✓' }] : []),
+            ],
+            particularites: '',
+            note: '',
+          };
+
+          const id = appendAnnonce(annonce);
+          details.push({ url, status: 'ok', message: `#${id} — ${annonce.loyer}€ — ${annonce.titre}` });
+          nbOk++;
+
+          // Petite pause pour ne pas spammer l'API
+          await new Promise(r => setTimeout(r, 300));
+
+        } catch(e) {
+          details.push({ url, status: 'erreur', message: e.message });
+          nbErreurs++;
+        }
+      }
+
+      // Un seul git push à la fin
+      if (nbOk > 0) {
+        gitPush('masse', `${nbOk} annonces importées`).catch(e => console.error('git push échoué :', e.message));
+      }
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: nbOk, doublons: nbDoublons, erreurs: nbErreurs, details }));
+    } catch(e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: 0, doublons: 0, erreurs: 1, details: [{ url: '', status: 'erreur', message: e.message }] }));
+    }
+    return;
+  }
+
   // Fichiers statiques
   let urlPath = req.url.split('?')[0];
   if (urlPath === '/' || urlPath === '') urlPath = '/admin.html';

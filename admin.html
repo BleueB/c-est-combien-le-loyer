@@ -116,6 +116,26 @@
   <div style="display:flex;gap:8px;margin-bottom:16px">
     <button class="tab-btn active" id="tabAjouter" onclick="switchTab('ajouter')">➕ Ajouter</button>
     <button class="tab-btn" id="tabAnnonces" onclick="switchTab('annonces')">📋 Mes annonces</button>
+    <button class="tab-btn" id="tabMasse" onclick="switchTab('masse')">⚡ Import en masse</button>
+  </div>
+
+  <!-- PANNEAU IMPORT EN MASSE -->
+  <div id="panelMasse" style="display:none">
+    <div class="card">
+      <h2>Import en masse depuis Bien'ici</h2>
+      <p style="font-size:0.82rem;color:#57606a;margin-bottom:14px;line-height:1.6">
+        1. Va sur <a href="https://www.bienici.com/recherche/location/appartement/nice-06000" target="_blank" style="color:#3b82d4">Bien'ici → Nice → Location</a><br>
+        2. Ouvre la console (F12) et colle ce code :
+        <br><code style="display:block;background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin:8px 0;font-size:0.78rem;user-select:all">JSON.stringify([...document.querySelectorAll('a[href*="/annonce/"]')].map(a=>a.href.split('?')[0]).filter((v,i,arr)=>arr.indexOf(v)===i).filter(u=>u.includes('/location/nice/')))</code>
+        3. Colle le résultat ci-dessous et clique Importer.
+      </p>
+      <div class="field">
+        <label>URLs (JSON array)</label>
+        <textarea id="masseurls" style="min-height:100px;font-size:0.78rem;font-family:monospace" placeholder='["https://www.bienici.com/annonce/location/nice/...","..."]'></textarea>
+      </div>
+      <button class="btn btn-blue" onclick="importerMasse()">⚡ Importer toutes les annonces</button>
+      <div id="masseLog" style="margin-top:14px;font-size:0.82rem;line-height:1.8"></div>
+    </div>
   </div>
 
   <!-- PANNEAU MES ANNONCES -->
@@ -257,9 +277,38 @@
   function switchTab(tab) {
     document.getElementById('panelAjouter').style.display  = tab === 'ajouter'  ? '' : 'none';
     document.getElementById('panelAnnonces').style.display = tab === 'annonces' ? '' : 'none';
+    document.getElementById('panelMasse').style.display    = tab === 'masse'    ? '' : 'none';
     document.getElementById('tabAjouter').classList.toggle('active',  tab === 'ajouter');
     document.getElementById('tabAnnonces').classList.toggle('active', tab === 'annonces');
+    document.getElementById('tabMasse').classList.toggle('active',    tab === 'masse');
     if (tab === 'annonces') renderAnnonces();
+  }
+
+  async function importerMasse() {
+    const log = document.getElementById('masseLog');
+    const raw = document.getElementById('masseurls').value.trim();
+    let urls;
+    try { urls = JSON.parse(raw); } catch(e) { log.innerHTML = '❌ JSON invalide — vérifie le format.'; return; }
+    if (!Array.isArray(urls) || !urls.length) { log.innerHTML = '❌ Aucune URL détectée.'; return; }
+
+    log.innerHTML = `⏳ Import de ${urls.length} annonces en cours…`;
+    const btn = document.querySelector('#panelMasse .btn-blue');
+    btn.disabled = true;
+
+    const res = await fetch('/import-masse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ urls })
+    });
+    const data = await res.json();
+
+    let html = `<strong>Résultat : ${data.ok} importées, ${data.doublons} doublons, ${data.erreurs} erreurs</strong><br><br>`;
+    for (const r of data.details) {
+      const icon = r.status === 'ok' ? '✅' : r.status === 'doublon' ? '⚠️' : '❌';
+      html += `${icon} ${r.url.split('/').pop()} — ${r.message}<br>`;
+    }
+    log.innerHTML = html;
+    btn.disabled = false;
   }
 
   function renderAnnonces() {
