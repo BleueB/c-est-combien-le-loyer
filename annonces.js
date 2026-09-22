@@ -5,6 +5,34 @@
 const ANNONCES = [
 
   // --- Jour 1 ---
+  {
+    jour: 1,
+    ville: "Antibes",
+    titre: "Rabiac - Carriat - Les Semboules - Les Brusquets, Antibes (06600)",
+    sous_titre: "Maison · Location meublée",
+    coords: [43.596683, 7.073261],
+    zoom: 16,
+    tooltip: "Rabiac - Carriat - Les Semboules - Les Brusquets, Antibes (06600)",
+    loyer: 3990,
+    lien: "https://www.bienici.com/annonce/location/antibes/maison/6pieces/citya-immobilier-1171-GES81660008-74?q=%2Frecherche%2Flocation%2Ffrance%3Fprix-min%3D3000",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "180.83 m²" },
+      { label: "Pièces", value: "6 pièces · 4 ch." },
+      { label: "Étage", value: "" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "Jardin" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "C · GES A" },
+      { label: "Chauffage", value: "Electrique Individuel" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏊 Piscine · 🌊 Vue mer · 🔇 Calme · 🏠 Cave · 🛋️ Meublé · ❄️ Climatisation",
+    note: "180.83 m² · 4 chambres · 2 sdb · exposition sud · jardin · cave · charges 330€/mois · 🏊 piscine · terrasse · garage/parking · 🌊 vue mer · entretien inclus",
+  },
 
   /* SUPPRIMÉ jour 1
   {
