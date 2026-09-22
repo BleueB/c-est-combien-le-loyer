@@ -169,8 +169,8 @@
   <a href="jeu.html" class="btn-jouer" id="btnJouer">Jouer la partie du jour →</a>
 
   <div class="regles">
-    <div class="regle"><span class="regle-icon">📍</span><span>Une carte pour situer l'appartement</span></div>
-    <div class="regle"><span class="regle-icon">📋</span><span>Les caractéristiques du logement</span></div>
+    <div class="regle"><span class="regle-icon">📍</span><span>Une carte pour situer le logement</span></div>
+    <div class="regle"><span class="regle-icon">📋</span><span>Une liste des caractéristiques du bien</span></div>
     <div class="regle"><span class="regle-icon">🎯</span><span>Tu glisses le curseur pour estimer le loyer charges comprises</span></div>
     <div class="regle"><span class="regle-icon">🔄</span><span>5 manches, les mêmes pour tout le monde chaque jour</span></div>
   </div>
@@ -180,14 +180,15 @@
 
 <script>
   // Calcul du numéro du jour depuis la date de lancement
-  const DATE_LANCEMENT = new Date('2025-10-01'); // À mettre à jour à la MEP
+  const DATE_LANCEMENT = new Date('2026-09-22'); // Date de lancement
   const NB_MANCHES = 5;
 
   function getNumJour() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
-    return Math.max(diff, 1);
+    return 1; // Mode test — décommenter le bloc ci-dessous pour la production
+    // const today = new Date();
+    // today.setHours(0, 0, 0, 0);
+    // const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
+    // return Math.max(diff, 1);
   }
 
   function getAnnoncesDuJour(numJour) {

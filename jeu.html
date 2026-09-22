@@ -111,7 +111,7 @@
   const SLIDER_MAX = 10000;
   const SLIDER_DEFAULT = Math.round((SLIDER_MIN + SLIDER_MAX) / 2);
   const NB_MANCHES = 5;
-  const DATE_LANCEMENT = new Date('2025-10-01'); // À mettre à jour à la MEP
+  const DATE_LANCEMENT = new Date('2026-09-22'); // Date de lancement
 
   let currentIndex = 0;
   let ordre = [];
@@ -120,10 +120,11 @@
 
   // --- JOUR ---
   function getNumJour() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
-    return Math.max(diff, 1);
+    return 1; // Mode test — décommenter le bloc ci-dessous pour la production
+    // const today = new Date();
+    // today.setHours(0, 0, 0, 0);
+    // const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
+    // return Math.max(diff, 1);
   }
 
   function getAnnoncesDuJour(num) {
@@ -266,11 +267,12 @@
   // --- RÉCAP ---
   function getVerdictGlobal(total, max) {
     const pct = total / max;
-    if (pct >= 0.9) return { emoji: '🏆', text: 'Expert du marché immo !', sub: pick(['Vous pouvez ouvrir votre agence.', 'On ne vous la fait pas.', 'Vous connaissez les prix sur le bout des doigts.']) };
-    if (pct >= 0.7) return { emoji: '🌟', text: 'Très bon score !', sub: pick(['Vous sentez le marché.', 'Quelques loyers vous ont résisté, mais pas beaucoup.', 'Les agences tremblent.']) };
-    if (pct >= 0.5) return { emoji: '🙂', text: 'Pas mal du tout !', sub: pick(['Vous commencez à sentir le marché.', 'Ni agent immo, ni touriste — quelque part entre les deux.', 'Dans la moyenne, c\'est déjà ça !']) };
-    if (pct >= 0.3) return { emoji: '😬', text: 'Peut mieux faire…', sub: pick(['Le marché vous a bien eu.', 'Le marché garde ses secrets.', 'Encore quelques parties…']) };
-    return { emoji: '💸', text: 'Aïe aïe aïe !', sub: pick(['Tu débarques de Paris ?', 'En vacances dans la région, peut-être ?', 'Le marché n\'a fait qu\'une bouchée de vous.']) };
+    if (pct >= 0.9) return { emoji: '🏆', text: 'Expert du marché immo !', sub: pick(['Vous pouvez ouvrir votre agence.', 'On ne vous la fait pas.', 'Vous connaissez les prix sur le bout des doigts.', 'Chasseur immobilier en secret ?']) };
+    if (pct >= 0.7) return { emoji: '🌟', text: 'Très bon score !', sub: pick(['Vous sentez le marché.', 'Quelques loyers vous ont résisté, mais pas beaucoup.', 'Les agences tremblent.', 'Vous avez l\'œil pour les prix.']) };
+    if (pct >= 0.5) return { emoji: '🙂', text: 'Pas mal du tout !', sub: pick(['Vous commencez à sentir le marché.', 'Ni agent immo, ni novice — quelque part entre les deux.', 'Dans la moyenne, c\'est déjà ça !', 'Le marché ne vous a pas totalement eu.']) };
+    if (pct >= 0.3) return { emoji: '😬', text: 'Peut mieux faire…', sub: pick(['Le marché vous a bien eu.', 'Le marché garde ses secrets.', 'Encore quelques parties et vous y serez.', 'Les loyers sont retors.']) };
+    return { emoji: '💸', text: 'Aïe aïe aïe !', sub: pick(['Vous découvrez le marché immo français ?', 'Le marché n\'a fait qu\'une bouchée de vous.', 'Revenez demain, ça ira mieux !', 'Les prix vous ont bien eu cette fois.']) };
+    // Variantes niçoises conservées : 'Tu débarques de Paris ?', 'En vacances dans la région, peut-être ?', 'Uno di noi !'
   }
 
   function afficherRecap() {
@@ -395,11 +397,12 @@
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   function getVerdict(score) {
-    if (score >= 900) return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Uno di noi !']), sub: pick(['Vrai expert immo ou vrai coup de chance ?', 'J\'en connais un qui tient les comptes.', 'On ne te la fait pas, à toi.', 'Une vision d\'aigle…', 'Agent immobilier en secret ?']) };
-    if (score >= 700) return { emoji: '🔥', text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !']), sub: pick(['Vous êtes du coin ?', 'Vous êtes déjà passé dans le quartier, n\'est-ce pas ?', 'Excellent sens du marché.']) };
-    if (score >= 450) return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(['Tu n\'es pas du coin, n\'est-ce pas ?', 'Vous vous défendez bien !']) };
-    if (score >= 150) return { emoji: '😅', text: 'Ouch !', sub: pick(['Combien coûte un pain au chocolat ?', 'Le marché vous a eu cette fois !']) };
-    return { emoji: '💸', text: 'Aïe !', sub: pick(['Tu débarques de Paris ?', 'Le marché n\'a pas fini de vous surprendre.']) };
+    if (score >= 900) return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(['Vrai expert immo ou vrai coup de chance ?', 'J\'en connais un qui tient les comptes.', 'On ne te la fait pas, à toi.', 'Une vision d\'aigle…', 'Chasseur immobilier en secret ?']) };
+    if (score >= 700) return { emoji: '🔥', text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !']), sub: pick(['Vous connaissez bien ce marché !', 'Vous avez déjà cherché un appart par ici ?', 'Excellent sens du marché.']) };
+    if (score >= 450) return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(['Ce marché vous réserve encore des surprises.', 'Vous vous défendez bien !', 'Pas loin !']) };
+    if (score >= 150) return { emoji: '😅', text: 'Ouch !', sub: pick(['Les loyers sont retors par ici…', 'Le marché vous a eu cette fois !', 'Difficile à estimer !']) };
+    return { emoji: '💸', text: 'Aïe !', sub: pick(['Le marché n\'a pas fini de vous surprendre.', 'Vous découvrez ce marché immo ?', 'Revenez demain !']) };
+    // Variantes niçoises conservées : 'Uno di noi !', 'Tu débarques de Paris ?', 'Vous êtes du coin ?', 'Tu n\'es pas du coin, n\'est-ce pas ?', 'Combien coûte un pain au chocolat ?'
   }
 
   function valider() {
