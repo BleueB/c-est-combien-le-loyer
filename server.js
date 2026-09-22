@@ -337,6 +337,52 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // POST /delete-annonce
+  if (req.method === 'POST' && req.url === '/delete-annonce') {
+    try {
+      const body = await readBody(req);
+      const { id } = JSON.parse(body);
+      if (!id) throw new Error('id manquant');
+
+      let src = fs.readFileSync(ANNONCES, 'utf8');
+
+      // Trouver le bloc de l'annonce par son id et le commenter
+      // Stratégie : trouver "id: N," puis remonter au "{" ouvrant, puis trouver le "}" fermant correspondant
+      const idPattern = new RegExp(`\\bid:\\s*${id}\\b`);
+      const idIdx = src.search(idPattern);
+      if (idIdx === -1) throw new Error(`Annonce #${id} introuvable dans annonces.js`);
+
+      // Remonter jusqu'au "{" ouvrant du bloc
+      let start = src.lastIndexOf('\n  {', idIdx);
+      if (start === -1) throw new Error(`Bloc introuvable pour #${id}`);
+      start += 1; // inclure le \n
+
+      // Avancer jusqu'au "}" fermant en comptant les accolades
+      let depth = 0, end = -1;
+      for (let i = start; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+      }
+      // Inclure la virgule et le retour à la ligne éventuel après
+      if (src[end] === ',') end++;
+      if (end === -1) throw new Error(`Fin de bloc introuvable pour #${id}`);
+
+      const bloc = src.slice(start, end);
+      const commented = `  /* SUPPRIMÉ #${id}\n${bloc.trim().replace(/^/gm, '  ')}\n  */`;
+      src = src.slice(0, start) + '\n' + commented + src.slice(end);
+      fs.writeFileSync(ANNONCES, src);
+
+      gitPush(id, `Suppression annonce #${id}`).catch(e => console.error('git push échoué :', e.message));
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } catch(e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
   // POST /import-masse
   if (req.method === 'POST' && req.url === '/import-masse') {
     try {

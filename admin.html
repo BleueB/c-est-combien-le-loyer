@@ -311,6 +311,21 @@
     btn.disabled = false;
   }
 
+  async function supprimerAnnonce(id, titre) {
+    if (!confirm(`Supprimer l'annonce #${id} — ${titre} ?\n\nElle sera commentée dans annonces.js (récupérable).`)) return;
+    const res = await fetch('/delete-annonce', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById(`row-${id}`).remove();
+    } else {
+      alert('Erreur : ' + data.error);
+    }
+  }
+
   function renderAnnonces() {
     fetch('/list-annonces')
       .then(r => r.json())
@@ -319,7 +334,8 @@
           document.getElementById('annoncesTableWrap').innerHTML = '<p style="color:#57606a;font-size:0.85rem">Aucune annonce active.</p>';
           return;
         }
-       const sourceCls = s => s === "Bien'ici" ? 's-bienici' : s === 'SeLoger' ? 's-seloger' : s === 'PAP' ? 's-pap' : 's-other';
+        annonces.sort((a, b) => a.id - b.id);
+        const sourceCls = s => s === "Bien'ici" ? 's-bienici' : s === 'SeLoger' ? 's-seloger' : s === 'PAP' ? 's-pap' : 's-other';
         const rows = annonces.map(a => {
           const surface = (a.badges?.find(b => b.label === 'Surface')?.value || '—');
           const meuble  = (a.badges?.find(b => b.label === 'Meublé')?.value || '—');
@@ -333,6 +349,7 @@
             <td><span class="badge-source ${sourceCls(a.source)}">${a.source}</span></td>
             <td>${a.lien ? `<a href="${a.lien}" target="_blank" class="lien-btn">Voir →</a>` : '—'}</td>
             <td id="status-${a.id}" style="font-size:0.78rem;color:#adb5bd">⏳</td>
+            <td><button onclick="supprimerAnnonce(${a.id},'${a.titre.replace(/'/g,"\\'")}')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:0.78rem">🗑️</button></td>
           </tr>`;
         }).join('');
         document.getElementById('annoncesTableWrap').innerHTML = `
@@ -340,7 +357,7 @@
           <div style="overflow-x:auto">
           <table class="annonces-table">
             <thead><tr>
-              <th>#</th><th>Titre</th><th>Surface</th><th>Loyer CC</th><th>Meublé</th><th>Source</th><th>Lien</th><th>Statut</th>
+              <th>#</th><th>Titre</th><th>Surface</th><th>Loyer CC</th><th>Meublé</th><th>Source</th><th>Lien</th><th>Statut</th><th></th>
             </tr></thead>
             <tbody>${rows}</tbody>
           </table>
