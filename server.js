@@ -149,7 +149,7 @@ ${badges}
 }
 
 function esc(s) {
-  return String(s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return String(s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ').replace(/\r/g, '');
 }
 
 function gitPush(id, titre) {

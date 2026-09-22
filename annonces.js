@@ -460,12 +460,7 @@ const ANNONCES = [
       { label: "DPE", value: "D · GES C" },
     ],
     particularites: "2e étage · Chauffage : électricité · Charges : 120€/mois",
-    note: "Appartement  - 2 pièces  - 57.05 m²
-
-Nice – Le Ray
-*Location étudiante 9 mois uniquement*
-
-Découvrez ce charmant grand deux-pièces meublé, idéalement situé dans le quartier recherché du Ray, au 2ᵉ et ",
+    note: "Appartement  - 2 pièces  - 57.05 m²  Nice – Le Ray *Location étudiante 9 mois uniquement*  Découvrez ce charmant grand deux-pièces meublé, idéalement situé dans le quartier recherché du Ray, au 2ᵉ et ",
   },
   {
     id: 39,
