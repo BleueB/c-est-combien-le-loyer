@@ -430,13 +430,34 @@ const server = http.createServer(async (req, res) => {
       lien:           url,
       source:         "Bien'ici",
       badges: [
-        { label: 'Surface',   value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
-        { label: 'Pièces',    value: String(d.roomsQuantity || '?') },
-        { label: 'Meublé',    value: d.isFurnished === true ? 'Oui' : 'Non' },
-        { label: 'DPE',       value: d.energyClassification && d.energyClassification !== 'NS' ? d.energyClassification : 'NS' },
-        { label: 'Balcon',    value: d.hasBalcony  === true ? '✓' : '—' },
-        { label: 'Terrasse',  value: d.hasTerrace  === true ? '✓' : '—' },
-        { label: 'Parking',   value: (d.hasParking === true || d.enclosedParkingQuantity > 0 || d.outdoorParkingQuantity > 0) ? '✓' : '—' },
+        { label: 'Surface',            value: d.surfaceArea ? `${d.surfaceArea} m²` : '?' },
+        { label: 'Pièces',             value: d.bedroomsQuantity > 0 ? `${d.roomsQuantity || '?'} pièces · ${d.bedroomsQuantity} ch.` : String(d.roomsQuantity || '?') },
+        { label: 'Étage',              value: d.floor > 0 ? `${d.floor}e${d.hasElevator === true ? ' · avec ascenseur' : ' · sans ascenseur'}` : d.floor === 0 ? 'RDC' : 'Non communiqué' },
+        { label: 'Meublé',             value: d.isFurnished === true ? '✅ Oui' : '❌ Non' },
+        { label: 'Parking',            value: (d.hasParking === true || d.enclosedParkingQuantity > 0 || d.outdoorParkingQuantity > 0) ? '✅ Oui' : '❌ Non' },
+        { label: 'Extérieur',          value: [d.hasBalcony === true ? 'Balcon' : '', d.hasTerrace === true ? 'Terrasse' : '', d.hasGarden === true ? 'Jardin' : ''].filter(Boolean).join(', ') || '❌ Aucun' },
+        { label: 'Année construction', value: d.yearOfConstruction ? String(d.yearOfConstruction) : 'Non communiquée' },
+        { label: 'DPE',                value: d.energyClassification && d.energyClassification !== 'NS' ? d.energyClassification : 'Non communiqué' },
+        { label: 'Chauffage',          value: d.heating || 'Non communiqué' },
+        { label: 'Exposition',         value: d.exposition || 'Non communiquée' },
+        { label: 'État',               value: (() => {
+          const t = (d.description||'').replace(/<[^>]+>/g,'').toLowerCase();
+          if (/entièrement rénov|refait à neuf|rénov[eé] avec goût/.test(t)) return '✨ Rénové';
+          if (/neuf|nouvelle construction/.test(t)) return '🆕 Neuf';
+          if (/bon état|bien entretenu|entretenu/.test(t)) return '👍 Bon état';
+          if (/à rénover|travaux|rafraîchir/.test(t)) return '🔧 À rénover';
+          return 'Non communiqué';
+        })() },
+        { label: 'Transports',         value: (() => {
+          const t = (d.description||'').replace(/<[^>]+>/g,'');
+          const transports = [];
+          const tram = t.match(/tram(?:way)?\s+(?:ligne\s+)?[A-ZT][0-9]?/gi);
+          if (tram) transports.push(...[...new Set(tram.map(s => s.trim()))].map(s => `🚋 ${s}`));
+          const bus = t.match(/(?:^|[\s,])ligne\s+[A-Z0-9]+/gim);
+          if (bus) transports.push(...[...new Set(bus.map(s => s.trim()))].slice(0,2).map(s => `🚌 ${s}`));
+          if (/gare\s+sncf|gare\s+de\s+nice/i.test(t)) transports.push('🚂 Gare SNCF');
+          return transports.length ? transports.join(', ') : 'Non communiqué';
+        })() },
       ],
       particularites: parts.join(' · '),
       note,
