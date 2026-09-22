@@ -2,9 +2,10 @@
 // Usage : node server.js
 // Puis ouvre http://localhost:3000/admin.html
 
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
+const http  = require('http');
+const fs    = require('fs');
+const path  = require('path');
+const { execFile } = require('child_process');
 
 const PORT       = 3000;
 const ROOT       = __dirname;
@@ -18,7 +19,72 @@ const MIME = {
   '.ico':  'image/x-icon',
 };
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── validation ───────────────────────────────────────────────────────────────
+
+function validerAnnonces() {
+  const src = fs.readFileSync(ANNONCES, 'utf8');
+  const erreurs = [];
+
+  // 1. Syntaxe JS — évaluation dans un contexte isolé
+  let annonces;
+  try {
+    const mod = { exports: {} };
+    const wrapped = `(function(module){ ${src.replace('const ANNONCES =', 'module.exports =')} })(module)`;
+    const vm = require('vm');
+    vm.runInNewContext(wrapped, { module: mod });
+    annonces = mod.exports;
+    if (!Array.isArray(annonces)) throw new Error('ANNONCES n\'est pas un tableau');
+  } catch(e) {
+    return [`❌ Syntaxe invalide dans annonces.js : ${e.message}`];
+  }
+
+  // 2. Vérifications par annonce
+  const ids = new Set();
+  const liens = new Set();
+
+  for (const a of annonces) {
+    const ctx = `Annonce #${a.id ?? '?'} (${a.titre ?? '?'})`;
+
+    if (!a.id)                    erreurs.push(`${ctx} : id manquant`);
+    if (ids.has(a.id))            erreurs.push(`${ctx} : id dupliqué (${a.id})`);
+    else if (a.id)                ids.add(a.id);
+
+    if (!a.titre)                 erreurs.push(`${ctx} : titre manquant`);
+    if (!a.loyer || a.loyer <= 0) erreurs.push(`${ctx} : loyer invalide (${a.loyer})`);
+    if (!a.lien)                  erreurs.push(`${ctx} : lien manquant`);
+    if (!a.source)                erreurs.push(`${ctx} : source manquante`);
+
+    // Coordonnées
+    if (!Array.isArray(a.coords) || a.coords.length !== 2) {
+      erreurs.push(`${ctx} : coords invalides`);
+    } else {
+      const [lat, lng] = a.coords;
+      if (lat < 41 || lat > 52) erreurs.push(`${ctx} : latitude suspecte (${lat}) — France attendue`);
+      if (lng < -5 || lng > 10) erreurs.push(`${ctx} : longitude suspecte (${lng}) — France attendue`);
+    }
+
+    // Badges obligatoires
+    const labelsAttendus = ['Surface','Pièces','Meublé','DPE'];
+    if (Array.isArray(a.badges)) {
+      for (const label of labelsAttendus) {
+        if (!a.badges.find(b => b.label === label && b.value)) {
+          erreurs.push(`${ctx} : badge "${label}" manquant ou vide`);
+        }
+      }
+    } else {
+      erreurs.push(`${ctx} : badges manquants`);
+    }
+
+    // Lien dupliqué
+    const lienBase = (a.lien || '').split('?')[0].replace(/\/$/, '');
+    if (lienBase && liens.has(lienBase)) erreurs.push(`${ctx} : lien dupliqué`);
+    else if (lienBase) liens.add(lienBase);
+  }
+
+  return erreurs;
+}
+
+// ── helpers ───────────────────────────────────────────────────────────────────
 
 function nextId() {
   const src = fs.readFileSync(ANNONCES, 'utf8');
@@ -114,6 +180,8 @@ const server = http.createServer(async (req, res) => {
       const body    = await readBody(req);
       const annonce = JSON.parse(body);
       const id      = appendAnnonce(annonce);
+      // Push vers GitHub en arrière-plan (non bloquant)
+      gitPush(id, annonce.titre).catch(e => console.error('git push échoué :', e.message));
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, id }));
     } catch (e) {

@@ -604,8 +604,10 @@
 
   // --- SCORE ---
   function calculerScore(estimation, reel) {
-    // Écart normalisé par rapport au loyer : 15% d'écart = ~500 pts
-    return Math.round(1000 * Math.exp(-Math.abs(estimation - reel) / (reel * 0.15)));
+    // Gaussienne : sigma = 25% du loyer → +25% d'écart ≈ 606 pts, +50% ≈ 135 pts
+    const ecart = Math.abs(estimation - reel);
+    const sigma = reel * 0.25;
+    return Math.round(1000 * Math.exp(-(ecart * ecart) / (2 * sigma * sigma)));
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 

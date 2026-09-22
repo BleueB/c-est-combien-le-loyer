@@ -58,6 +58,7 @@ const ANNONCES = [
     note: "2ème étage sans ascenseur, vue mer depuis le séjour, chambre sur cour calme. Promenade des Anglais à deux pas.",
   },
 
+  /* ANNONCE EXPIRÉE #3 — Carré d'or, Nice (06000) — annonce retirée du marché
   {
     id: 3,
     titre: "Carré d'or, Nice (06000)",
@@ -85,6 +86,9 @@ const ANNONCES = [
     particularites: "🛣️ Rue piétonne calme · 🛍️ Commerces à pied · 🌊 Mer et plages proches · 🎓 Étudiant uniquement",
     note: "Studio au 3ème étage sans ascenseur, rue Paradis, rue piétonne calme. Coin cuisine équipé, salle d'eau avec WC. Double vitrage, climatisation réversible.",
   },
+  */
+
+  /* ANNONCE EXPIRÉE #4 — Carabacel, Nice (06000) — annonce retirée du marché
   {
     id: 4,
     titre: "Carabacel, Nice (06000)",
@@ -112,6 +116,7 @@ const ANNONCES = [
     particularites: "🏰 Vue colline du château · 🌆 Cœur de Nice · 🛍️ Proche port et vieille ville · 🏠 Mezzanine",
     note: "2ème étage, séjour avec coin cuisine indépendant, une chambre, balcon vue château. Grande mezzanine avec chambre et salle d'eau à l'étage.",
   },
+  */
 
   {
     id: 5,
@@ -195,6 +200,7 @@ const ANNONCES = [
     particularites: "🔨 Rénové · 🛋️ Meublé",
     note: "Au coeur du Vieux-Nice, idéalement situé rue droite à quelques pas de la Place Rossetti, nous vous proposons à la location ce studio avec mezzanine totalement rénové avec prestations de très bon standing, meublé et entièrement équipé, disposant d'une salle d'eau et wc.",
   },
+  /* DOUBLON #8 — même annonce que #7 (immo-facile-50597392)
   {
     id: 8,
     titre: "Vieux Nice, Nice (06300)",
@@ -222,6 +228,7 @@ const ANNONCES = [
     particularites: "🔨 Rénové · 🛋️ Meublé",
     note: "Au coeur du Vieux-Nice, idéalement situé rue droite à quelques pas de la Place Rossetti, nous vous proposons à la location ce studio avec mezzanine totalement rénové avec prestations de très bon standing, meublé et entièrement équipé, disposant d'une salle d'eau et wc.",
   },
+  */
   {
     id: 9,
     titre: "Vieux Nice, Nice (06300)",
