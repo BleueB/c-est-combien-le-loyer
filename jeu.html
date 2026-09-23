@@ -145,7 +145,8 @@
   };
 
   function getDepartement(annonce) {
-    // Chercher un code postal dans ville ou titre
+    if (annonce.departement) return annonce.departement;
+    // Fallback : extraire depuis le CP dans ville ou titre
     const cp = (annonce.ville + ' ' + (annonce.titre || '')).match(/\b(\d{5})\b/);
     if (!cp) return null;
     const code = cp[1].slice(0, 2);
