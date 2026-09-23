@@ -2,4 +2,8 @@ server.js
 admin.html
 check-annonces.js
 map-styles.html
+mockup-*.html
+preview-*.html
+test-*.html
+.DS_Store
 node_modules/

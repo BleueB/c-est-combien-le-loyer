@@ -17,23 +17,213 @@
       min-height: 100vh; display: flex; flex-direction: column; align-items: center;
       padding: 24px 16px 48px;
     }
-    header { text-align: center; margin-bottom: 28px; }
-    header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; color: #1a1714; }
-    header p { color: #6b6560; font-size: 0.92rem; margin-top: 5px; }
+    header {
+      width: 100%;
+      max-width: 640px;
+      margin-bottom: 22px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #1a1714;
+      margin: 0;
+    }
+    .live-score-pill {
+      background: #fff8f5;
+      color: #c4622d;
+      border: 1px solid #f0d8cc;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .story-bars-wrap {
+      margin-top: 10px;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    .story-segment {
+      height: 8px;
+      border-radius: 999px;
+      background: #e8e4de;
+      overflow: hidden;
+      position: relative;
+      transition: background 0.25s ease;
+    }
+    .story-segment.green  { background: #16a34a; }
+    .story-segment.yellow { background: #d97706; }
+    .story-segment.red    { background: #dc2626; }
+    .story-segment.active {
+      background: #c4622d;
+      box-shadow: 0 0 8px rgba(196,98,45,0.4);
+      animation: pulseSegment 1.6s infinite ease-in-out;
+    }
+    @keyframes pulseSegment {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+    .story-legend {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #6b6560;
+    }
     .card { background: #fff; border: 1px solid #e8e4de; border-radius: 16px; padding: 28px; max-width: 640px; width: 100%; box-shadow: 0 1px 4px rgba(26,23,20,0.06); }
     .annonce-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; color: #1a1714; }
     .annonce-ville { font-size: 0.85rem; color: #6b6560; margin-bottom: 18px; font-weight: 600; }
     .map-wrap { width: 100%; height: 200px; border-radius: 12px; border: 1px solid #e8e4de; margin-bottom: 18px; overflow: hidden; }
     #map { width: 100%; height: 100%; }
     .badge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-    .badge { background: #fff8f5; border: 1px solid #f0d8cc; border-radius: 10px; padding: 7px 10px; display: flex; flex-direction: column; gap: 1px; }
+    .badge {
+      background: #fff8f5;
+      border: 1px solid #f0d8cc;
+      border-radius: 10px;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .badge-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
     .badge .label { font-size: 0.58rem; color: #c4622d; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 800; }
     .badge .value { font-size: 0.82rem; font-weight: 700; color: #1a1714; }
     .badge-full { grid-column: 1 / -1; }
     .badge-full .value { font-size: 0.88rem; line-height: 1.6; }
-    .note { background: #fff8f5; border-left: 3px solid #c4622d; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.87rem; color: #6b6560; margin-bottom: 24px; line-height: 1.55; font-style: italic; }
+    .note {
+      background: #fff8f5;
+      border: 1px solid #f0d8cc;
+      border-left: 3px solid #c4622d;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.87rem;
+      color: #6b6560;
+      margin-bottom: 24px;
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .note-bubble-icon {
+      font-size: 1.15rem;
+      line-height: 1.3;
+      flex-shrink: 0;
+    }
+    .note-text {
+      font-style: italic;
+    }
+
+    /* Animation tremblement / secousse quand score < 100 */
+    @keyframes lowScoreShake {
+      0%, 100% { transform: translateX(0); }
+      15% { transform: translateX(-6px) rotate(-1.5deg); }
+      30% { transform: translateX(5px) rotate(1.5deg); }
+      45% { transform: translateX(-5px) rotate(-1deg); }
+      60% { transform: translateX(4px) rotate(1deg); }
+      75% { transform: translateX(-2px); }
+    }
+    .score-block.low-score {
+      border-color: #fca5a5;
+      background: #fff5f5;
+      animation: lowScoreShake 0.6s ease-in-out;
+    }
+    .score-block.low-score .score-number {
+      color: #dc2626;
+    }
+
+    /* Animation éclat / célébration quand score > 850 */
+    @keyframes highScorePulse {
+      0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 0 16px rgba(22, 163, 74, 0.25); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+    @keyframes emojiPop {
+      0% { transform: scale(0.5) rotate(-10deg); }
+      50% { transform: scale(1.3) rotate(8deg); }
+      75% { transform: scale(0.95) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .score-block.high-score {
+      border-color: #86efac;
+      background: linear-gradient(180deg, #f0fdf4 0%, #fff8f5 100%);
+      animation: highScorePulse 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .score-block.high-score .score-number {
+      color: #16a34a;
+    }
+    .score-block.high-score .emoji-verdict {
+      display: inline-block;
+      animation: emojiPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Animation pinpoint qui atterrit avec rebond sur le toit */
+    @keyframes pinDrop {
+      0% {
+        opacity: 0;
+        transform: translateY(-45px) scale(0.6);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(2px) scale(1.15, 0.85);
+      }
+      80% {
+        transform: translateY(-8px) scale(0.95, 1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .custom-house-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+      animation: pinDrop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform-origin: bottom center;
+    }
+
     .divider { border: none; border-top: 1px solid #e8e4de; margin: 20px 0; }
-    .estimation-zone label { display: block; font-weight: 800; font-size: 1rem; margin-bottom: 14px; color: #1a1714; }
+    .estimation-zone { text-align: center; }
+    .estimation-zone label {
+      display: block;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: #1a1714;
+    }
+    .price-display-center {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #c4622d;
+      line-height: 1;
+      margin-bottom: 14px;
+      letter-spacing: -0.5px;
+    }
     .slider-row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
     input[type=range] { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 4px; background: #f0d8cc; outline: none; cursor: pointer; }
     input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #c4622d; border: 3px solid #fff; box-shadow: 0 1px 5px rgba(196,98,45,0.35); cursor: pointer; }
@@ -100,8 +290,24 @@
 <body>
 
 <header>
-  <h1>🏠 C'est Combien Le Loyer ?</h1>
-  <p id="headerSub">Partie du jour</p>
+  <div class="header-top">
+    <h1>🏠 C'est Combien Le Loyer ?</h1>
+    <span class="live-score-pill" id="liveScorePill">✨ 0 pt</span>
+  </div>
+
+  <div class="story-bars-wrap">
+    <div class="story-grid" id="storyGrid">
+      <div class="story-segment active"></div>
+      <div class="story-segment"></div>
+      <div class="story-segment"></div>
+      <div class="story-segment"></div>
+      <div class="story-segment"></div>
+    </div>
+    <div class="story-legend">
+      <span id="storyStepText">Manche 1 sur 5</span>
+      <span id="headerSub">Partie du jour</span>
+    </div>
+  </div>
 </header>
 
 <div class="card" id="card">
@@ -119,6 +325,29 @@
   const SLIDER_DEFAULT = Math.round((SLIDER_MIN + SLIDER_MAX) / 2);
   const NB_MANCHES = 5;
   const DATE_LANCEMENT = new Date('2026-09-23'); // Date de lancement
+
+  const BADGE_ICONS = {
+    'surface': '📐',
+    'pièces': '🚪',
+    'étage': '🏢',
+    'meublé': '🪑',
+    'parking': '🚗',
+    'extérieur': '🌿',
+    'année construction': '📅',
+    'état': '✨',
+    'dpe': '⚡',
+    'chauffage': '🔥',
+    'exposition': '☀️',
+    'transports': '🚇'
+  };
+
+  function getBadgeIcon(label) {
+    const k = (label || '').toLowerCase();
+    for (const key in BADGE_ICONS) {
+      if (k.includes(key)) return BADGE_ICONS[key];
+    }
+    return '📌';
+  }
 
   const DEPARTEMENTS = {
     '01':'Ain','02':'Aisne','03':'Allier','04':'Alpes-de-Haute-Provence','05':'Hautes-Alpes',
@@ -206,11 +435,34 @@
     return 'source-def';
   }
 
+  function updateStoryHeader() {
+    const segs = document.querySelectorAll('.story-segment');
+    let totalScore = 0;
+    
+    segs.forEach((seg, i) => {
+      seg.className = 'story-segment';
+      if (scores[i] !== undefined) {
+        totalScore += scores[i].score;
+        if (scores[i].score >= 700) seg.classList.add('green');
+        else if (scores[i].score >= 300) seg.classList.add('yellow');
+        else seg.classList.add('red');
+      } else if (i === currentIndex) {
+        seg.classList.add('active');
+      }
+    });
+
+    const liveScoreEl = document.getElementById('liveScorePill');
+    if (liveScoreEl) liveScoreEl.textContent = `✨ ${totalScore.toLocaleString('fr-FR')} pts`;
+    const stepEl = document.getElementById('storyStepText');
+    if (stepEl) stepEl.textContent = `Manche ${Math.min(currentIndex + 1, NB_MANCHES)} sur ${NB_MANCHES}`;
+  }
+
   // --- RENDER ---
   function renderAnnonce(a) {
+    updateStoryHeader();
     const pos = currentIndex + 1;
     const badgesHTML = a.badges.map(b =>
-      `<div class="badge"><span class="label">${b.label}</span><span class="value">${b.value}</span></div>`
+      `<div class="badge"><span class="badge-icon">${getBadgeIcon(b.label)}</span><div class="badge-content"><span class="label">${b.label}</span><span class="value">${b.value}</span></div></div>`
     ).join('');
 
     document.getElementById('card').innerHTML = `
@@ -227,12 +479,13 @@
       <div class="map-wrap"><div id="map"></div></div>
       <div class="badge-grid">
         ${badgesHTML}
-        ${a.particularites ? `<div class="badge badge-full"><span class="label">Particularités</span><span class="value">${a.particularites}</span></div>` : ''}
+        ${a.particularites ? `<div class="badge badge-full"><span class="badge-icon">✨</span><div class="badge-content"><span class="label">Particularités</span><span class="value">${a.particularites}</span></div></div>` : ''}
       </div>
-      ${a.note ? `<div class="note">${a.note}</div>` : ''}
+      ${a.note ? `<div class="note"><span class="note-bubble-icon">💬</span><div class="note-text">${a.note}</div></div>` : ''}
       <hr class="divider" />
       <div class="estimation-zone" id="zoneEstimation">
-        <label>💶 Votre estimation (charges comprises)</label>
+        <label>Ton estimation loyer charges comprises</label>
+        <div class="price-display-center" id="priceDisplayCentred">${SLIDER_DEFAULT.toLocaleString('fr-FR')} €</div>
         <div class="slider-row">
           <input type="range" id="slider" min="${SLIDER_MIN}" max="${SLIDER_MAX}" value="${SLIDER_DEFAULT}" step="50"
             oninput="syncFromSlider(this.value)" />
@@ -290,7 +543,7 @@
   }
 
   function afficherResultatExistant(r, a) {
-    const v = getVerdict(r.score);
+    const v = getVerdict(r.score, r.ecart);
     document.getElementById('emojiVerdict').textContent = v.emoji;
     document.getElementById('verdictText').textContent = v.text;
     document.getElementById('verdictSub').textContent = v.sub;
@@ -301,6 +554,12 @@
     document.getElementById('loyerReel').innerHTML = `${a.loyer.toLocaleString('fr-FR')} €/mois <span style="font-size:0.82rem;font-weight:600" class="${colorClass}">(${ecartStr})</span>`;
     setTimeout(() => { document.getElementById('precisionFill').style.width = (r.score / 10) + '%'; }, 120);
     document.getElementById('scoreAffiche').textContent = r.score;
+    const scoreBlock = document.querySelector('.score-block');
+    if (scoreBlock) {
+      scoreBlock.classList.remove('low-score', 'high-score');
+      if (r.score < 100) scoreBlock.classList.add('low-score');
+      else if (r.score > 850) scoreBlock.classList.add('high-score');
+    }
     document.getElementById('zoneEstimation').style.display = 'none';
     document.getElementById('resultat').style.display = 'block';
     const estDerniere = currentIndex === NB_MANCHES - 1;
@@ -402,11 +661,11 @@
     map.on('click', () => map.scrollWheelZoom.enable());
     map.on('mouseout', () => map.scrollWheelZoom.disable());
     const pinIcon = L.divIcon({
-      html: '<div style="background:#3b82d4;width:13px;height:13px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4)"></div>',
-      className: '', iconSize: [13,13], iconAnchor: [6,6]
+      html: '<div class="custom-house-pin">📍</div>',
+      className: '', iconSize: [26, 26], iconAnchor: [13, 24]
     });
     L.marker(a.coords, { icon: pinIcon }).addTo(map)
-      .bindTooltip(a.tooltip || a.ville, { permanent: true, direction: 'top', offset: [0,-10] });
+      .bindTooltip(a.tooltip || a.ville, { permanent: true, direction: 'top', offset: [0,-22] });
     const ResetControl = L.Control.extend({
       options: { position: 'topright' },
       onAdd: () => {
@@ -425,13 +684,24 @@
   // --- SLIDER ---
   function updateSliderBg(val) {
     const pct = ((val - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
-    document.getElementById('slider').style.background =
-      `linear-gradient(to right, #3b82d4 0%, #3b82d4 ${pct}%, #e5e7eb ${pct}%, #e5e7eb 100%)`;
+    const slider = document.getElementById('slider');
+    if (slider) {
+      slider.style.background =
+        `linear-gradient(to right, #c4622d 0%, #c4622d ${pct}%, #f0d8cc ${pct}%, #f0d8cc 100%)`;
+    }
   }
-  function syncFromSlider(val) { document.getElementById('montant').value = val; updateSliderBg(val); }
+  function syncFromSlider(val) {
+    document.getElementById('montant').value = val;
+    const priceEl = document.getElementById('priceDisplayCentred');
+    if (priceEl) priceEl.textContent = Number(val).toLocaleString('fr-FR') + ' €';
+    updateSliderBg(val);
+  }
   function syncFromInput(val) {
     const v = Math.min(Math.max(parseInt(val) || SLIDER_MIN, SLIDER_MIN), SLIDER_MAX);
-    document.getElementById('slider').value = v; updateSliderBg(v);
+    document.getElementById('slider').value = v;
+    const priceEl = document.getElementById('priceDisplayCentred');
+    if (priceEl) priceEl.textContent = Number(v).toLocaleString('fr-FR') + ' €';
+    updateSliderBg(v);
   }
 
   // --- SCORE ---
@@ -442,13 +712,74 @@
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-  function getVerdict(score) {
-    if (score >= 900) return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(['Vrai expert immo ou vrai coup de chance ?', 'J\'en connais un qui tient les comptes.', 'On ne te la fait pas, à toi.', 'Une vision d\'aigle…', 'Chasseur immobilier en secret ?']) };
-    if (score >= 700) return { emoji: '🔥', text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !']), sub: pick(['Vous connaissez bien ce marché !', 'Vous avez déjà cherché un appart par ici ?', 'Excellent sens du marché.']) };
-    if (score >= 450) return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(['Ce marché vous réserve encore des surprises.', 'Vous vous défendez bien !', 'Pas loin !']) };
-    if (score >= 150) return { emoji: '😅', text: 'Ouch !', sub: pick(['Les loyers sont retors par ici…', 'Le marché vous a eu cette fois !', 'Difficile à estimer !']) };
-    return { emoji: '💸', text: 'Aïe !', sub: pick(['Le marché n\'a pas fini de vous surprendre.', 'Vous découvrez le marché immo français ?', 'Revenez demain !']) };
-    // Variantes niçoises conservées : 'Uno di noi !', 'Tu débarques de Paris ?', 'Vous êtes du coin ?', 'Tu n\'es pas du coin, n\'est-ce pas ?', 'Combien coûte un pain au chocolat ?'
+  function getVerdict(score, ecart = 0) {
+    if (score >= 900) {
+      const subs = [
+        'Vrai expert immo ou vrai coup de chance ?',
+        'J\'en connais un qui tient les comptes.',
+        'On ne te la fait pas, à toi.',
+        'Une vision d\'aigle…',
+        'Chasseur immobilier en secret ?',
+        'T\'es le propriétaire ou quoi ?',
+        'Même l\'agent immobilier n\'était pas aussi précis.',
+        'Tu passes trop de temps sur SeLoger le dimanche soir.',
+        'Dossier accepté sans garant, direct.',
+        'Stéphane Plaza en sueur.',
+        'Tu as le bail sous les yeux, avoue.'
+      ];
+      return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(subs) };
+    }
+
+    if (score >= 700) {
+      const subs = [
+        'Vous connaissez bien ce marché !',
+        'Vous avez déjà cherché un appart par ici ?',
+        'Excellent sens du marché.',
+        'On sent que tu as déjà épluché les annonces du coin.',
+        'Presque au centime près, respect.',
+        'L\'œil du pro, il te manquait juste le coût du local vélo.'
+      ];
+      return { emoji: '🔥', text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !', 'Solide !']), sub: pick(subs) };
+    }
+
+    if (score >= 450) {
+      const subs = [
+        'Ce marché vous réserve encore des surprises.',
+        'Vous vous défendez bien !',
+        'Pas loin !',
+        'Pas si loin, mais le proprio a été un poil plus gourmand.',
+        'Tu as oublié de compter les charges de copro ?',
+        'Le marché a encore quelques petits secrets pour toi.',
+        'C\'est le supplément "charme de l\'ancien" qui t\'a trompé.'
+      ];
+      return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(subs) };
+    }
+
+    if (score >= 150) {
+      const subs = [
+        'Les loyers sont retors par ici…',
+        'Le marché vous a eu cette fois !',
+        'Difficile à estimer !',
+        'À ce prix-là, t\'as juste la cave et le local poubelles.',
+        'Tu as estimé les prix en francs ou quoi ?'
+      ];
+      if (ecart < 0) {
+        subs.push('Le propriétaire vient de faire un malaise en voyant ton offre.');
+      }
+      return { emoji: '😅', text: 'Ouch !', sub: pick(subs) };
+    }
+
+    const subs = [
+      'Le marché n\'a pas fini de vous surprendre.',
+      'Vous découvrez le marché immo français ?',
+      'Revenez demain !',
+      'Dossier refusé immédiatement, même avec 12 garants en CDI.',
+      'Complètement à côté de la plaque (et du département).'
+    ];
+    if (ecart < 0) {
+      subs.push('Tu vis encore chez tes parents, non ?');
+    }
+    return { emoji: '💸', text: 'Aïe !', sub: pick(subs) };
   }
 
   function valider() {
@@ -457,8 +788,10 @@
     const score = calculerScore(estimation, a.loyer);
     const ecart = estimation - a.loyer;
     const ecartAbs = Math.abs(ecart);
-    const verdict = getVerdict(score);
+    const verdict = getVerdict(score, ecart);
     scores[currentIndex] = { estimation, score, ecart };
+    sauvegarder();
+    updateStoryHeader();
 
     document.getElementById('emojiVerdict').textContent = verdict.emoji;
     document.getElementById('verdictText').textContent = verdict.text;
@@ -469,6 +802,12 @@
     document.getElementById('loyerReel').innerHTML = `${a.loyer.toLocaleString('fr-FR')} €/mois <span style="font-size:0.82rem;font-weight:600" class="${colorClass}">(${ecartStr})</span>`;
     setTimeout(() => { document.getElementById('precisionFill').style.width = (score / 10) + '%'; }, 120);
     animerScore(score);
+    const scoreBlock = document.querySelector('.score-block');
+    if (scoreBlock) {
+      scoreBlock.classList.remove('low-score', 'high-score');
+      if (score < 100) scoreBlock.classList.add('low-score');
+      else if (score > 850) scoreBlock.classList.add('high-score');
+    }
     document.getElementById('zoneEstimation').style.display = 'none';
     document.getElementById('resultat').style.display = 'block';
     const estDerniere = currentIndex === NB_MANCHES - 1;
