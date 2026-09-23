@@ -656,8 +656,11 @@
   // --- MAP ---
   function initMap(a) {
     const map = L.map('map', { zoomControl: true, scrollWheelZoom: false, dragging: true, attributionControl: false }).setView(a.coords, a.zoom || 15);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      subdomains: 'abcd'
+    }).addTo(map);
+    L.control.attribution({ prefix: '© CARTO, © OpenStreetMap' }).addTo(map);
     map.on('click', () => map.scrollWheelZoom.enable());
     map.on('mouseout', () => map.scrollWheelZoom.disable());
     const pinIcon = L.divIcon({
