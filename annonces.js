@@ -577,6 +577,35 @@ const ANNONCES = [
 
 
   // --- Jour 3 ---
+  {
+    id: 14,
+    jour: 3,
+    ville: "Chamalières",
+    titre: "Royat, Chamalières (63400)",
+    sous_titre: "Appartement · Location meublée",
+    coords: [45.765861, 3.060808],
+    zoom: 16,
+    tooltip: "Royat, Chamalières (63400)",
+    loyer: 1480,
+    lien: "https://www.bienici.com/annonce/location/chamalieres/appartement/4pieces/citya-immobilier-33843621500044-GES97840222-702?q=%2Frecherche%2Flocation%2Ffrance%3Fcamera%3D15_2.5733003_44.3511276_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "83.55 m²" },
+      { label: "Pièces", value: "4 pièces · 3 ch." },
+      { label: "Étage", value: "8e" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "Balcon" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "E · GES E" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Exposition", value: "Plein Sud" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏠 Cave · 🛋️ Meublé",
+    note: "Appartement meublé T4 de 83,55m² à Chamalières, dernier étage d'un immeuble de huit étages avec ascenseur. Comporte 3 chambres, cuisine équipée, salle de bain moderne et balcon plein sud. Situé dans un quartier agréable, à proximité de tous les commerces et transports nécessaires. Offre vue dégagée et tranquillité appréciable. Visite possible.",
+  },
 
   /* SUPPRIMÉ jour 3
   {
