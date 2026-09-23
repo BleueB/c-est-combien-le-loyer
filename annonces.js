@@ -102,7 +102,7 @@ const ANNONCES = [
     sous_titre: "Appartement · Paris 15e · 75015",
     coords: [48.85186, 2.29336],
     zoom: 16,
-    tooltip: "Dupleix - Motte Picquet",
+    tooltip: "Dupleix - Motte Picquet, 4p · 100.43m²",
     loyer: 9000,
     lien: "https://www.bienici.com/annonce/location/paris-15e/appartement/4pieces/apimo-86969257?q=%2Frecherche%2Flocation%2Ffrance%3Fprix-min%3D3000",
     source: "Bien'ici",
@@ -112,15 +112,15 @@ const ANNONCES = [
       { label: "Étage", value: "9e · avec ascenseur" },
       { label: "Meublé", value: "✅ Oui" },
       { label: "Parking", value: "❌ Non" },
-      { label: "Extérieur", value: "❌ Aucun" },
+      { label: "Extérieur", value: "✅ Oui, 2 terrasses" },
       { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "✨ Rénové" },
       { label: "DPE", value: "E" },
       { label: "Chauffage", value: "Radiateur Electrique Individuel" },
       { label: "Exposition", value: "Non communiquée" },
-      { label: "État", value: "✨ Rénové" },
-      { label: "Transports", value: "Non communiqué" },
+      { label: "Transports", value: "Métro" },
     ],
-    particularites: "9e étage · 🛗 Ascenseur · Chauffage : Radiateur Electrique Individuel · Charges : 220€/mois",
+    particularites: "9e étage · 🛗 Ascenseur · Chauffage : Radiateur Electrique Individuel · Vue Tour Eiffel",
     note: "9ème étage, immeuble sécurisé, 100m² appartement, ascenseur, récentement rénové par un architecte de renom, climatisé, 2 terrasses, 1 chambre en suite et 1 chambre/bureau, vue Tour Eiffel, Invalides, proximité gardien, interphone, digicode, local vélos, 2 parkings, cave, chauffage et eau chaude individuels électriques, disponible immédiatement, Bail CIV.",
   },
   {
@@ -566,5 +566,37 @@ const ANNONCES = [
     },
   */
 
+
+  // --- Jour 3 ---
+  {
+    jour: 3,
+    ville: "Saint-Alban-Leysse",
+    titre: "Saint-Alban-Leysse, Saint-Alban-Leysse (73230)",
+    sous_titre: "Maison · Location meublée",
+    coords: [45.583521, 5.960448],
+    zoom: 16,
+    tooltip: "Saint-Alban-Leysse, Saint-Alban-Leysse (73230)",
+    loyer: 3800,
+    lien: "https://www.bienici.com/annonce/location/saint-alban-leysse/maison/7pieces/apimo-87333363?q=%2Frecherche%2Flocation%2Ffrance%3Fprix-min%3D3000%26camera%3D7_2.9482444_46.09456_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "179.07 m²" },
+      { label: "Pièces", value: "7 pièces · 4 ch." },
+      { label: "Étage", value: "" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Terrasse + Jardin" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "C · GES B" },
+      { label: "Chauffage", value: "Au sol Pompe à chaleur Individuel" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏊 Piscine · 🔇 Calme · ☀️ Lumineux · 🛋️ Meublé · ❄️ Climatisation",
+    note: "Villa d'architecte de 2005, Saint-Alban-Leysse. Calme, parcelle de 2000m². Intérieur: 4 chambres, espace de vie lumineux, salle d'eau fonctionnelle, suite parentale. Extérieur: piscine, grande terrasse couverte, terrain de boules, double garage de 42m². Proche église, proximité des commodités et accès autoroutiers. Louée meublée.",
+  },
+
 ];
+
 
