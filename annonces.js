@@ -789,6 +789,39 @@ const ANNONCES = [
     note: "Villa d'architecte de 2005, Saint-Alban-Leysse. Calme, parcelle de 2000m². Intérieur: 4 chambres, espace de vie lumineux, salle d'eau fonctionnelle, suite parentale. Extérieur: piscine, grande terrasse couverte, terrain de boules, double garage de 42m². Proche église, proximité des commodités et accès autoroutiers. Louée meublée.",
   },
 
+
+  // --- Jour 4 ---
+  {
+    id: 16,
+    jour: 4,
+    ville: "Troyes",
+    titre: "Troyes (10000)",
+    sous_titre: "Appartement · Location",
+    coords: [48.300611, 4.081072],
+    zoom: 16,
+    tooltip: "Troyes (10000)",
+    loyer: 500,
+    lien: "https://www.seloger.com/annonce/location/grand-est/aube-10/troyes-10000/263KADHX9VHR?ln=classified_search_results_map&serp_view=map&search=distributionTypes%3DRent%26estateTypes%3DHouse%2CApartment%26locations%3DeyJwbGFjZUlkIjoiQUQwOEZSODExMyIsInJhZGl1cyI6NDYsInBvbHlsaW5lIjoiZ31fekd5e31LfHBAYnlVYHNDbHxUZm9GaGRTfmFJfnJQZmhLfGtNYF9NZnNJbmROem1FZHdOYGFBbnZOdWtBbGJOe3ZFfHtMZ3lJbmRLX25Nan5IfXBQYGxGZ35SfHBDb3NUaHBAb25VaXBAcW5VfXBDbXNUYWxGaX5Sa35Ie3BQb2RLYW5NfXtMZ3lJbWJOe3ZFb3ZOc2tBZXdOYGFBb2ROem1FYV9NZnNJZ2hLfGtNX2JJfnJQZ29GZmRTYXNDbnxUfXBAYnlVIiwiY29vcmRpbmF0ZXMiOnsibGF0Ijo0NS45NTgzMzkzNDI2NzkyOTUsImxuZyI6Mi4xMjQyOTIzNzU4NjY2MTY2fX0%26method%3Dform#ln=classified_search_results_map&m=classified_search_results_map_classified_classified_detail_M",
+    source: "SeLoger",
+    badges: [
+      { label: "Surface", value: "47,32 m²" },
+      { label: "Pièces", value: "2 pièces · 1 ch." },
+      { label: "Étage", value: "1e · sans ascenseur" },
+      { label: "Meublé", value: "N/A" },
+      { label: "Parking", value: "Non" },
+      { label: "Extérieur", value: "Non" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "Non communiqué" },
+      { label: "Chauffage", value: "Chauffage central: Radiateur Sources d'é" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏠 Cave",
+    note: "Appartement de 2 pièces à louer dans le centre-ville de Troyes (10000). Inclut 1 chambre, cuisine équipée et cellier. Proximité de commerces et transports.",
+  },
+
 ];
+
 
 
