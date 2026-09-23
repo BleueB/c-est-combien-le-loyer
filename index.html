@@ -235,15 +235,15 @@
 
 <script>
   // Calcul du numéro du jour depuis la date de lancement
-  const DATE_LANCEMENT = new Date('2026-09-23'); // Date de lancement
+  const DATE_LANCEMENT = new Date(2026, 8, 23); // Date de lancement (mois 0-indexé : 8 = Septembre)
   const NB_MANCHES = 5;
 
   function getNumJour() {
     const testJour = parseInt(localStorage.getItem('cctl_testJour') || '');
     if (!isNaN(testJour) && testJour > 0) return testJour;
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
+    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diff = Math.round((todayLocal - DATE_LANCEMENT) / 86400000) + 1;
     return Math.max(diff, 1);
   }
 
