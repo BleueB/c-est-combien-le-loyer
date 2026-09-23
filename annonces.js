@@ -577,6 +577,34 @@ const ANNONCES = [
 
 
   // --- Jour 3 ---
+  {
+    jour: 3,
+    ville: "Vichy",
+    titre: "Coeur de Ville, Vichy (03200)",
+    sous_titre: "Appartement · Location vide",
+    coords: [46.125516, 3.422633],
+    zoom: 16,
+    tooltip: "Coeur de Ville, Vichy (03200)",
+    loyer: 1130,
+    lien: "https://www.bienici.com/annonce/location/vichy/appartement/3pieces/ag030607-541160849?q=%2Frecherche%2Flocation%2Ffrance%3Fprix-min%3D1000%26camera%3D15_3.4122687_46.1242522_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "82 m²" },
+      { label: "Pièces", value: "3 pièces · 2 ch." },
+      { label: "Étage", value: "2e" },
+      { label: "Meublé", value: "❌ Non" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "❌ Non" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "D · GES C" },
+      { label: "Chauffage", value: "collectif" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏠 Cave · ☀️ Lumineux",
+    note: "Vichy centre : appartement T3 lumineux de 82,5 m², ascenseur, proche commerces, transports et services. Sur 2 étages, comprend séjour lumineux, cuisine équipée, 2 chambres, salle d'eau, cellier et cave. Chauffage et eau compris dans charges. Risques immobiliers détaillés sur le site Géorisques.",
+  },
 
   /* SUPPRIMÉ jour 3
   {
