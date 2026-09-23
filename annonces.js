@@ -818,7 +818,7 @@ const ANNONCES = [
       { label: "Transports", value: "Non communiqué" },
     ],
     particularites: "🏠 Cave",
-    note: "Appartement de 2 pièces à louer dans le centre-ville de Troyes (10000). Inclut 1 chambre, cuisine équipée et cellier. Proximité de commerces et transports.",
+    note: "Appartement de 2 pièces à louer dans le centre-ville de Troyes. Inclut 1 chambre, cuisine équipée et cellier. Proximité de commerces et transports.",
   },
 
 ];

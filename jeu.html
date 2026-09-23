@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>C'est Combien Ton Loyer ? 🏠</title>
+  <title>C'est Combien Le Loyer ? 🏠</title>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -80,9 +80,15 @@
     .recap-score { font-size: 3.5rem; font-weight: 900; color: #c4622d; line-height: 1; margin-bottom: 4px; }
     .recap-score-max { font-size: 0.88rem; color: #6b6560; margin-bottom: 24px; }
     .recap-detail { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; text-align: left; }
-    .recap-ligne { display: flex; justify-content: space-between; align-items: center; background: #fff8f5; border: 1px solid #f0d8cc; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; }
+    .recap-ligne { display: flex; justify-content: space-between; align-items: center; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; border: 1.5px solid transparent; }
+    .recap-ligne.vert   { background: #f0fdf4; border-color: #86efac; }
+    .recap-ligne.orange { background: #fffbeb; border-color: #fcd34d; }
+    .recap-ligne.rouge  { background: #fff1f2; border-color: #fca5a5; }
     .recap-ligne .rl { color: #6b6560; }
     .recap-ligne .rv { font-weight: 700; }
+    .recap-ligne.vert   .rv { color: #16a34a; }
+    .recap-ligne.orange .rv { color: #d97706; }
+    .recap-ligne.rouge  .rv { color: #dc2626; }
     .nav-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .nav-btn { background: #fff8f5; border: 1px solid #e8e4de; border-radius: 8px; padding: 7px 14px; font-size: 0.88rem; font-weight: 700; color: #1a1714; cursor: pointer; transition: background 0.15s; }
     .nav-btn:hover { background: #f0d8cc; }
@@ -94,7 +100,7 @@
 <body>
 
 <header>
-  <h1>🏠 C'est Combien Ton Loyer ?</h1>
+  <h1>🏠 C'est Combien Le Loyer ?</h1>
   <p id="headerSub">Partie du jour</p>
 </header>
 
@@ -104,7 +110,7 @@
 
 <footer>
   <a href="index.html" style="color:#adb5bd;text-decoration:none">← Accueil</a>
-  &nbsp;·&nbsp; C'est Combien Ton Loyer ?
+  &nbsp;·&nbsp; C'est Combien Le Loyer ?
 </footer>
 
 <script>
@@ -113,6 +119,38 @@
   const SLIDER_DEFAULT = Math.round((SLIDER_MIN + SLIDER_MAX) / 2);
   const NB_MANCHES = 5;
   const DATE_LANCEMENT = new Date('2026-09-23'); // Date de lancement
+
+  const DEPARTEMENTS = {
+    '01':'Ain','02':'Aisne','03':'Allier','04':'Alpes-de-Haute-Provence','05':'Hautes-Alpes',
+    '06':'Alpes-Maritimes','07':'Ardèche','08':'Ardennes','09':'Ariège','10':'Aube',
+    '11':'Aude','12':'Aveyron','13':'Bouches-du-Rhône','14':'Calvados','15':'Cantal',
+    '16':'Charente','17':'Charente-Maritime','18':'Cher','19':'Corrèze','2A':'Corse-du-Sud',
+    '2B':'Haute-Corse','21':'Côte-d\'Or','22':'Côtes-d\'Armor','23':'Creuse','24':'Dordogne',
+    '25':'Doubs','26':'Drôme','27':'Eure','28':'Eure-et-Loir','29':'Finistère',
+    '30':'Gard','31':'Haute-Garonne','32':'Gers','33':'Gironde','34':'Hérault',
+    '35':'Ille-et-Vilaine','36':'Indre','37':'Indre-et-Loire','38':'Isère','39':'Jura',
+    '40':'Landes','41':'Loir-et-Cher','42':'Loire','43':'Haute-Loire','44':'Loire-Atlantique',
+    '45':'Loiret','46':'Lot','47':'Lot-et-Garonne','48':'Lozère','49':'Maine-et-Loire',
+    '50':'Manche','51':'Marne','52':'Haute-Marne','53':'Mayenne','54':'Meurthe-et-Moselle',
+    '55':'Meuse','56':'Morbihan','57':'Moselle','58':'Nièvre','59':'Nord',
+    '60':'Oise','61':'Orne','62':'Pas-de-Calais','63':'Puy-de-Dôme','64':'Pyrénées-Atlantiques',
+    '65':'Hautes-Pyrénées','66':'Pyrénées-Orientales','67':'Bas-Rhin','68':'Haut-Rhin','69':'Rhône',
+    '70':'Haute-Saône','71':'Saône-et-Loire','72':'Sarthe','73':'Savoie','74':'Haute-Savoie',
+    '75':'Paris','76':'Seine-Maritime','77':'Seine-et-Marne','78':'Yvelines','79':'Deux-Sèvres',
+    '80':'Somme','81':'Tarn','82':'Tarn-et-Garonne','83':'Var','84':'Vaucluse',
+    '85':'Vendée','86':'Vienne','87':'Haute-Vienne','88':'Vosges','89':'Yonne',
+    '90':'Territoire de Belfort','91':'Essonne','92':'Hauts-de-Seine','93':'Seine-Saint-Denis',
+    '94':'Val-de-Marne','95':'Val-d\'Oise','971':'Guadeloupe','972':'Martinique',
+    '973':'Guyane','974':'La Réunion','976':'Mayotte',
+  };
+
+  function getDepartement(annonce) {
+    // Chercher un code postal dans ville ou titre
+    const cp = (annonce.ville + ' ' + (annonce.titre || '')).match(/\b(\d{5})\b/);
+    if (!cp) return null;
+    const code = cp[1].slice(0, 2);
+    return DEPARTEMENTS[code] || null;
+  }
 
   let currentIndex = 0;
   let ordre = [];
@@ -180,7 +218,10 @@
         <span class="nav-counter">${pos} / ${NB_MANCHES}</span>
         <button class="nav-btn" onclick="goTo(currentIndex + 1)" ${scores[currentIndex] === undefined || currentIndex === NB_MANCHES - 1 ? 'disabled' : ''}>Suivante →</button>
       </div>
-      <div class="annonce-title">📍 ${a.titre || (a.ville + (a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''))}</div>
+      <div class="annonce-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span>📍 ${a.titre || (a.ville + (a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''))}</span>
+        ${getDepartement(a) ? `<span style="background:#f0f2f5;color:#57606a;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">${getDepartement(a)}</span>` : ''}
+      </div>
       <div class="annonce-ville">${a.ville}${a.sous_titre ? ' · ' + a.sous_titre : ''}</div>
       <div class="map-wrap"><div id="map"></div></div>
       <div class="badge-grid">
@@ -294,14 +335,14 @@
     const lignesHTML = scores.map((r, i) => {
       const a = ordre[i];
       const ecartStr = (r.ecart >= 0 ? '+' : '') + r.ecart.toLocaleString('fr-FR') + ' €';
-      const col = Math.abs(r.ecart) <= 50 ? 'green' : Math.abs(r.ecart) <= 150 ? 'orange' : 'red';
+      const couleur = r.score >= 700 ? 'vert' : r.score >= 300 ? 'orange' : 'rouge';
       return `
-        <div class="recap-ligne">
-          <span class="rl">${i + 1}. ${a.ville}${a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''}</span>
-          <span style="display:flex;align-items:center;gap:10px">
+        <div class="recap-ligne ${couleur}">
+          <span class="rl" style="flex:1;min-width:0;margin-right:10px">${i + 1}. ${a.ville}${a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''}</span>
+          <span style="display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap">
             <span class="rv">${r.score} pts</span>
-            <span class="rv ${col}" style="font-size:0.8rem">${ecartStr}</span>
-            ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" style="margin:0;padding:3px 9px;font-size:0.75rem;border-width:1.5px;white-space:nowrap" onclick="trackVoirAnnonce(this,'recap')">
+            <span class="rv" style="font-size:0.8rem">${ecartStr}</span>
+            ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" style="margin:0;padding:3px 0;font-size:0.75rem;border-width:1.5px;white-space:nowrap;width:64px;justify-content:center" onclick="trackVoirAnnonce(this,'recap')">
               <span class="badge-source" style="font-size:0.65rem;padding:1px 5px">${sourceAbbrev(a.source)}</span> →
             </a>` : ''}
           </span>
@@ -336,11 +377,11 @@
   }
 
   function partagerRecap(total, max, emojis) {
-    const lien = 'https://bleueb.github.io/c-est-combien-ton-loyer/';
-    const texte = `🏠 C'est Combien Ton Loyer ? — Partie #${numJour}\n${emojis}\n${total} / ${max} pts\n${lien}`;
+    const lien = 'https://bleueb.github.io/c-est-combien-le-loyer/';
+    const texte = `🏠 C'est Combien Le Loyer ? — Partie #${numJour}\n${emojis}\n${total} / ${max} pts\n${lien}`;
     if (typeof umami !== 'undefined') umami.track('score-partage', { score: total, jour: numJour });
     if (navigator.share) {
-      navigator.share({ title: "C'est Combien Ton Loyer ?", text: texte }).catch(() => {});
+      navigator.share({ title: "C'est Combien Le Loyer ?", text: texte }).catch(() => {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(texte).then(() => {
         const btn = document.querySelector('.btn-partager');
@@ -357,6 +398,8 @@
     const map = L.map('map', { zoomControl: true, scrollWheelZoom: false, dragging: true, attributionControl: false }).setView(a.coords, a.zoom || 15);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(map);
+    map.on('click', () => map.scrollWheelZoom.enable());
+    map.on('mouseout', () => map.scrollWheelZoom.disable());
     const pinIcon = L.divIcon({
       html: '<div style="background:#3b82d4;width:13px;height:13px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4)"></div>',
       className: '', iconSize: [13,13], iconAnchor: [6,6]
