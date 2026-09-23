@@ -6,6 +6,7 @@ const ANNONCES = [
 
   // --- Jour 1 ---
   {
+    id: 1,
     jour: 1,
     ville: "Nice",
     titre: "Nice (06000)",
@@ -96,6 +97,7 @@ const ANNONCES = [
     },
   */
   {
+    id: 2,
     jour: 1,
     ville: "Paris 15e",
     titre: "Dupleix - Motte Picquet, 4p · 100.43m²",
@@ -124,6 +126,7 @@ const ANNONCES = [
     note: "9ème étage, immeuble sécurisé, 100m² appartement, ascenseur, récentement rénové par un architecte de renom, climatisé, 2 terrasses, 1 chambre en suite et 1 chambre/bureau, vue Tour Eiffel, Invalides, proximité gardien, interphone, digicode, local vélos, 2 parkings, cave, chauffage et eau chaude individuels électriques, disponible immédiatement, Bail CIV.",
   },
   {
+    id: 3,
     jour: 1,
     ville: "Antibes",
     titre: "Rabiac - Carriat - Les Semboules - Les Brusquets, 6p · 180.83m²",
@@ -148,7 +151,7 @@ const ANNONCES = [
       { label: "État", value: "Non communiqué" },
       { label: "Transports", value: "Non communiqué" },
     ],
-    particularites: "🪣 Cave · Chauffage : Electrique Individuel · Exposition : Sud · Charges : 330€/mois",
+    particularites: "🪣 Cave · ☀️ Exposition Sud",
     note: "Villa T6, 180m², Antibes center. Bright living spaces, spacious living room, fully equipped kitchen. 4 climate-controlled bedrooms, private parental suite with terrace. Mezzanine office with sea view. Landscaped garden, pool, garage, exterior parking, laundry room. South-facing, sea view, calm neighborhood.",
   },
 
@@ -183,6 +186,7 @@ const ANNONCES = [
     },
   */
   {
+    id: 4,
     jour: 1,
     ville: "Eymoutiers",
     titre: "Eymoutiers (87120)",
@@ -211,6 +215,7 @@ const ANNONCES = [
     note: "48.79 m² · 2 chambres",
   },
   {
+    id: 5,
     jour: 1,
     ville: "Andernos-les-Bains",
     titre: "Andernos-les-Bains (33510)",
@@ -269,11 +274,10 @@ const ANNONCES = [
       note: "",
     },
   */
-  // { jour: 1, ville: "Paris", coords: [48.8566, 2.3522], zoom: 15, tooltip: "Paris · Marais", loyer: 1800, lien: "https://...", source: "Bien'ici", badges: [ ... ], particularites: "", note: "" },
-
 
   // --- Jour 2 ---
   {
+    id: 6,
     jour: 2,
     ville: "Saint-Affrique",
     titre: "Saint-Affrique, Saint-Affrique (12400)",
@@ -302,6 +306,7 @@ const ANNONCES = [
     note: "3e étage · 89 m² · 4 chambres",
   },
   {
+    id: 7,
     jour: 2,
     ville: "Viviers-du-Lac",
     titre: "Viviers-du-Lac (73420)",
@@ -330,6 +335,7 @@ const ANNONCES = [
     note: "Appartement 3 pièces, 2 chambres, 62 m², 1er étage à Viviers-du-Lac (73420). Infrastructure : parking privé, balcon, cuisine intégrée, WC séparés, pas d'ascenseur. Proximité commerces/transports.",
   },
   {
+    id: 8,
     jour: 2,
     ville: "Lorient",
     titre: "Lorient (56100)",
@@ -358,6 +364,7 @@ const ANNONCES = [
     note: "Studio à louer, étudiant, Kervaric-Kerichant-Lanveur, Lorient. Proximité université, commerce, transports.  Résidence étudiante Campus Horizon, Lorient. Proximité université, commerce, transports. Studios meublés avec connexion internet.",
   },
   {
+    id: 9,
     jour: 2,
     ville: "Reims",
     titre: "Reims (51100)",
@@ -382,10 +389,11 @@ const ANNONCES = [
       { label: "Exposition", value: "Non communiquée" },
       { label: "Transports", value: "🚋 Tram · 🚌 Bus" },
     ],
-    particularites: "48.825500, 7.480029",
+    particularites: "",
     note: "Studio étudiant, 17 m², 1er étage, Quartier Courlancy, Reims (51100). Proximité IUT, fac de médecine, transport (tramway, bus). Studio avec cuisine et salle de bains. Immeuble raccordé à la fibre optique.",
   },
   {
+    id: 10,
     jour: 3,
     ville: "Bouxwiller",
     titre: "Bouxwiller (67330)",
@@ -414,6 +422,7 @@ const ANNONCES = [
     note: "Maison individuelle de 136 m² à louer à Bouxwiller (67330), offrant 5 pièces, cuisine équipée, salon, bureau, jardin, et 2 salles de bain. Proximité des commerces et transports.",
   },
   {
+    id: 11,
     jour: 2,
     ville: "Rodez",
     titre: "Centre historique - Vieux-Rodez, Rodez (12000)",
@@ -569,6 +578,35 @@ const ANNONCES = [
 
   // --- Jour 3 ---
   {
+    jour: 3,
+    ville: "Saint-Alban-Leysse",
+    titre: "Saint-Alban-Leysse, Saint-Alban-Leysse (73230)",
+    sous_titre: "Maison · Location meublée",
+    coords: [45.583521, 5.960448],
+    zoom: 16,
+    tooltip: "Saint-Alban-Leysse, Saint-Alban-Leysse (73230)",
+    loyer: 3800,
+    lien: "https://www.bienici.com/annonce/location/saint-alban-leysse/maison/7pieces/apimo-87333363?q=%2Frecherche%2Flocation%2Ffrance%3Fprix-min%3D3000%26camera%3D7_2.9482444_46.09456_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "179.07 m²" },
+      { label: "Pièces", value: "7 pièces · 4 ch." },
+      { label: "Étage", value: "" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Terrasse + Jardin" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "C · GES B" },
+      { label: "Chauffage", value: "Au sol Pompe à chaleur Individuel" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🏊 Piscine · 🔇 Calme · ☀️ Lumineux · 🛋️ Meublé · ❄️ Climatisation",
+    note: "Villa architecte de 2005, calme et privilégié quartier à Saint-Alban-Leysse. Édifiée sur 2000 m² plat, 4 chambres, meublée, piscine, grande couverte terrasse, terrain de boules, double garage. Proche église, proximité commerces et transports.",
+  },
+  {
+    id: 12,
     jour: 3,
     ville: "Saint-Alban-Leysse",
     titre: "Saint-Alban-Leysse, Saint-Alban-Leysse (73230)",
