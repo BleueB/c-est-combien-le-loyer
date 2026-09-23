@@ -14,13 +14,14 @@
   <meta name="twitter:description" content="5 annonces. 5 loyers à deviner. On m'a dit que t'étais expert immo ?"/>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
   <script src="annonces.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-      background: #f0f2f5;
-      color: #1f2328;
+      background: #faf9f7;
+      color: #1a1714;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -41,56 +42,61 @@
     }
 
     h1 {
+      font-family: 'Syne', system-ui, sans-serif;
       font-size: 1.7rem;
       font-weight: 900;
       letter-spacing: -0.5px;
       margin-bottom: 10px;
       line-height: 1.2;
+      color: #1a1714;
     }
 
     .tagline {
       font-size: 1.05rem;
-      color: #57606a;
+      color: #6b6560;
       margin-bottom: 36px;
       line-height: 1.6;
     }
 
     .card {
       background: #fff;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #e8e4de;
       border-radius: 16px;
       padding: 28px 24px;
       margin-bottom: 20px;
       text-align: left;
+      box-shadow: 0 1px 4px rgba(26,23,20,0.06);
     }
 
     .jour-label {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #57606a;
+      letter-spacing: 0.1em;
+      color: #c4622d;
       margin-bottom: 6px;
     }
 
     .jour-titre {
+      font-family: 'Syne', system-ui, sans-serif;
       font-size: 1.15rem;
       font-weight: 900;
-      color: #1f2328;
+      color: #1a1714;
       margin-bottom: 4px;
     }
 
     .jour-sub {
       font-size: 0.85rem;
-      color: #57606a;
+      color: #6b6560;
     }
 
     .btn-jouer {
       display: block;
       width: 100%;
       padding: 16px;
-      background: #1f2328;
+      background: #c4622d;
       color: #fff;
+      font-family: 'Syne', system-ui, sans-serif;
       font-size: 1.05rem;
       font-weight: 800;
       border: none;
@@ -102,11 +108,11 @@
       letter-spacing: 0.01em;
       margin-bottom: 12px;
     }
-    .btn-jouer:hover { background: #333; }
+    .btn-jouer:hover { background: #a8501f; }
 
     .btn-jouer.disabled {
-      background: #e5e7eb;
-      color: #adb5bd;
+      background: #e8e4de;
+      color: #b5afa8;
       cursor: default;
       pointer-events: none;
     }
@@ -134,7 +140,7 @@
       align-items: flex-start;
       gap: 12px;
       font-size: 0.88rem;
-      color: #57606a;
+      color: #6b6560;
       line-height: 1.5;
     }
     .regle-icon {
@@ -146,7 +152,7 @@
     footer {
       margin-top: 28px;
       font-size: 0.75rem;
-      color: #adb5bd;
+      color: #b5afa8;
     }
   </style>
 </head>
@@ -180,15 +186,16 @@
 
 <script>
   // Calcul du numéro du jour depuis la date de lancement
-  const DATE_LANCEMENT = new Date('2026-09-22'); // Date de lancement
+  const DATE_LANCEMENT = new Date('2026-09-23'); // Date de lancement
   const NB_MANCHES = 5;
 
   function getNumJour() {
-    return 1; // Mode test — décommenter le bloc ci-dessous pour la production
-    // const today = new Date();
-    // today.setHours(0, 0, 0, 0);
-    // const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
-    // return Math.max(diff, 1);
+    const testJour = parseInt(localStorage.getItem('cctl_testJour') || '');
+    if (!isNaN(testJour) && testJour > 0) return testJour;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = Math.floor((today - DATE_LANCEMENT) / 86400000) + 1;
+    return Math.max(diff, 1);
   }
 
   function getAnnoncesDuJour(numJour) {
