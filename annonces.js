@@ -121,7 +121,7 @@ const ANNONCES = [
       { label: "Transports", value: "Non communiqué" },
     ],
     particularites: "9e étage · 🛗 Ascenseur · Chauffage : Radiateur Electrique Individuel · Charges : 220€/mois",
-    note: "9e étage · 100.43 m² · 2 chambres · ascenseur · ❄️ clim · charges 220€/mois · terrasse 80m² · garage/parking",
+    note: "9ème étage, immeuble sécurisé, 100m² appartement, ascenseur, récentement rénové par un architecte de renom, climatisé, 2 terrasses, 1 chambre en suite et 1 chambre/bureau, vue Tour Eiffel, Invalides, proximité gardien, interphone, digicode, local vélos, 2 parkings, cave, chauffage et eau chaude individuels électriques, disponible immédiatement, Bail CIV.",
   },
   {
     jour: 1,
@@ -149,7 +149,7 @@ const ANNONCES = [
       { label: "Transports", value: "Non communiqué" },
     ],
     particularites: "🪣 Cave · Chauffage : Electrique Individuel · Exposition : Sud · Charges : 330€/mois",
-    note: "180.83 m² · 4 chambres · 2 sdb · exposition sud · jardin · cave · charges 330€/mois · 🏊 piscine · terrasse · garage/parking · 🌊 vue mer · entretien inclus",
+    note: "Villa T6, 180m², Antibes center. Bright living spaces, spacious living room, fully equipped kitchen. 4 climate-controlled bedrooms, private parental suite with terrace. Mezzanine office with sea view. Landscaped garden, pool, garage, exterior parking, laundry room. South-facing, sea view, calm neighborhood.",
   },
 
   /* SUPPRIMÉ jour 1
