@@ -271,4 +271,36 @@ const ANNONCES = [
   */
   // { jour: 1, ville: "Paris", coords: [48.8566, 2.3522], zoom: 15, tooltip: "Paris · Marais", loyer: 1800, lien: "https://...", source: "Bien'ici", badges: [ ... ], particularites: "", note: "" },
 
+
+  // --- Jour 2 ---
+  {
+    jour: 2,
+    ville: "Reims",
+    titre: "Reims (51100)",
+    sous_titre: "Studio · Location",
+    coords: [43.685989, 7.237476],
+    zoom: 16,
+    tooltip: "Reims (51100)",
+    loyer: 395,
+    lien: "https://www.pap.fr/annonces/appartement-reims-51100-r416701492",
+    source: "PAP",
+    badges: [
+      { label: "Surface", value: "17 m²" },
+      { label: "Pièces", value: "1 pièce" },
+      { label: "Étage", value: "1e · sans ascenseur" },
+      { label: "Meublé", value: "N/A" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "❌ Aucun" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "Non communiqué" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "🚋 Tram · 🚌 Bus" },
+    ],
+    particularites: "",
+    note: "Studio étudiant, 17m² dans le quartier Courlancy de Reims (51100). Proche de l'IUT, faculté de médecine, transports en commun (tramway, bus). Studio avec cuisine, salle de bains et wc. Immeuble raccordé à la fibre optique. Loyer compris 395 €/mois. Contactez le propriétaire : 06 17 63 25 81 ou 03 26 03 00 63.",
+  },
+
 ];
+
