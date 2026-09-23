@@ -274,7 +274,7 @@ const ANNONCES = [
 
   // --- Jour 2 ---
   {
-    jour: 2,
+    jour: 1,
     ville: "Bouxwiller",
     titre: "Bouxwiller (67330)",
     sous_titre: "Maison · Location",
@@ -360,34 +360,37 @@ const ANNONCES = [
       note: "Appartement 3 pièces, 2 chambres, 62m², 1er étage à Viviers-du-Lac (73420). Inclut forfait de charges. Parking privé, balcon. Proximité commerce et transports.",
     },
   */
+
+  /* SUPPRIMÉ jour 2
   {
-    jour: 2,
-    ville: "Lorient",
-    titre: "Lorient (56100)",
-    sous_titre: "Studio · Location meublée",
-    coords: [43.685989, 7.237476],
-    zoom: 16,
-    tooltip: "Lorient (56100)",
-    loyer: 485,
-    lien: "https://www.seloger.com/annonce/location/bretagne/morbihan-56/lorient-56100/26VMEHPDKDW9?ln=classified_search_results_map&serp_view=map&search=distributionTypes%3DRent%26estateTypes%3DHouse%2CApartment%26locations%3DeyJwbGFjZUlkIjoiQUQwOEZSODExMyIsInJhZGl1cyI6NDYsInBvbHlsaW5lIjoiZ31fekd5e31LfHBAYnlVYHNDbHxUZm9GaGRTfmFJfnJQZmhLfGtNYF9NZnNJbmROem1FZHdOYGFBbnZOdWtBbGJOe3ZFfHtMZ3lJbmRLX25Nan5IfXBQYGxGZ35SfHBDb3NUaHBAb25VaXBAcW5VfXBDbXNUYWxGaX5Sa35Ie3BQb2RLYW5NfXtMZ3lJbWJOe3ZFb3ZOc2tBZXdOYGFBb2ROem1FYV9NZnNJZ2hLfGtNX2JJfnJQZ29GZmRTYXNDbnxUfXBAYnlVIiwiY29vcmRpbmF0ZXMiOnsibGF0Ijo0NS45NTgzMzkzNDI2NzkyOTUsImxuZyI6Mi4xMjQyOTIzNzU4NjY2MTY2fX0%26method%3Dform#ln=classified_search_results_map&m=classified_search_results_map_classified_classified_detail_M",
-    source: "SeLoger",
-    badges: [
-      { label: "Surface", value: "19 m²" },
-      { label: "Pièces", value: "1 pièce" },
-      { label: "Étage", value: "1e · sans ascenseur" },
-      { label: "Meublé", value: "✅ Oui" },
-      { label: "Parking", value: "❌ Non" },
-      { label: "Extérieur", value: "Balcon" },
-      { label: "Année construction", value: "Non communiquée" },
-      { label: "État", value: "Entretenu" },
-      { label: "DPE", value: "Non communiqué" },
-      { label: "Chauffage", value: "Non communiqué" },
-      { label: "Exposition", value: "Non communiquée" },
-      { label: "Transports", value: "Non communiqué" },
-    ],
-    particularites: "",
-    note: "Studio à louer pour étudiants - Résidence Campus Horizon, Lorient. Proche campus universitaire de Lanveur, commerces, et transports. Studio meublé avec cuisine, salle de bain privative, et internet haut débit.",
-  },
+      jour: 2,
+      ville: "Lorient",
+      titre: "Lorient (56100)",
+      sous_titre: "Studio · Location meublée",
+      coords: [43.685989, 7.237476],
+      zoom: 16,
+      tooltip: "Lorient (56100)",
+      loyer: 485,
+      lien: "https://www.seloger.com/annonce/location/bretagne/morbihan-56/lorient-56100/26VMEHPDKDW9?ln=classified_search_results_map&serp_view=map&search=distributionTypes%3DRent%26estateTypes%3DHouse%2CApartment%26locations%3DeyJwbGFjZUlkIjoiQUQwOEZSODExMyIsInJhZGl1cyI6NDYsInBvbHlsaW5lIjoiZ31fekd5e31LfHBAYnlVYHNDbHxUZm9GaGRTfmFJfnJQZmhLfGtNYF9NZnNJbmROem1FZHdOYGFBbnZOdWtBbGJOe3ZFfHtMZ3lJbmRLX25Nan5IfXBQYGxGZ35SfHBDb3NUaHBAb25VaXBAcW5VfXBDbXNUYWxGaX5Sa35Ie3BQb2RLYW5NfXtMZ3lJbWJOe3ZFb3ZOc2tBZXdOYGFBb2ROem1FYV9NZnNJZ2hLfGtNX2JJfnJQZ29GZmRTYXNDbnxUfXBAYnlVIiwiY29vcmRpbmF0ZXMiOnsibGF0Ijo0NS45NTgzMzkzNDI2NzkyOTUsImxuZyI6Mi4xMjQyOTIzNzU4NjY2MTY2fX0%26method%3Dform#ln=classified_search_results_map&m=classified_search_results_map_classified_classified_detail_M",
+      source: "SeLoger",
+      badges: [
+        { label: "Surface", value: "19 m²" },
+        { label: "Pièces", value: "1 pièce" },
+        { label: "Étage", value: "1e · sans ascenseur" },
+        { label: "Meublé", value: "✅ Oui" },
+        { label: "Parking", value: "❌ Non" },
+        { label: "Extérieur", value: "Balcon" },
+        { label: "Année construction", value: "Non communiquée" },
+        { label: "État", value: "Entretenu" },
+        { label: "DPE", value: "Non communiqué" },
+        { label: "Chauffage", value: "Non communiqué" },
+        { label: "Exposition", value: "Non communiquée" },
+        { label: "Transports", value: "Non communiqué" },
+      ],
+      particularites: "",
+      note: "Studio à louer pour étudiants - Résidence Campus Horizon, Lorient. Proche campus universitaire de Lanveur, commerces, et transports. Studio meublé avec cuisine, salle de bain privative, et internet haut débit.",
+    },
+  */
 
   /* SUPPRIMÉ jour 2
   {
