@@ -386,7 +386,7 @@ const ANNONCES = [
     note: "Studio étudiant, 17 m², 1er étage, Quartier Courlancy, Reims (51100). Proximité IUT, fac de médecine, transport (tramway, bus). Studio avec cuisine et salle de bains. Immeuble raccordé à la fibre optique.",
   },
   {
-    jour: 1,
+    jour: 3,
     ville: "Bouxwiller",
     titre: "Bouxwiller (67330)",
     sous_titre: "Maison · Location",
