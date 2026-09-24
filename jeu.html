@@ -522,7 +522,7 @@
         </div>
         ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" onclick="trackVoirAnnonce(this)">
           <span class="badge-source">${sourceAbbrev(a.source)}</span>
-          Voir l'annonce
+          Voir les photos de l'annonce
         </a>` : ''}
         <button class="btn-suivante" id="btnSuivante" style="display:none" onclick="goTo(currentIndex + 1)">
           Annonce suivante →
@@ -543,7 +543,7 @@
   }
 
   function afficherResultatExistant(r, a) {
-    const v = getVerdict(r.score, r.ecart);
+    const v = getVerdict(r.score, r.ecart, currentIndex);
     document.getElementById('emojiVerdict').textContent = v.emoji;
     document.getElementById('verdictText').textContent = v.text;
     document.getElementById('verdictSub').textContent = v.sub;
@@ -638,7 +638,9 @@
 
   function partagerRecap(total, max, emojis) {
     const lien = 'https://bleueb.github.io/c-est-combien-le-loyer/';
-    const texte = `🏠 C'est Combien Le Loyer ? — Partie #${numJour}\n${emojis}\n${total} / ${max} pts\n${lien}`;
+    const totalStr = total.toLocaleString('fr-FR');
+    const maxStr = max.toLocaleString('fr-FR');
+    const texte = `🏠 C'est Combien Le Loyer ? — Partie #${numJour}\nScore : ${totalStr} / ${maxStr} pts 🏆\n${emojis}\n${lien}`;
     if (typeof umami !== 'undefined') umami.track('score-partage', { score: total, jour: numJour });
     if (navigator.share) {
       navigator.share({ title: "C'est Combien Le Loyer ?", text: texte }).catch(() => {});
@@ -714,7 +716,7 @@
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-  function getVerdict(score, ecart = 0) {
+  function getVerdict(score, ecart = 0, indexManche = currentIndex) {
     if (score >= 900) {
       const subs = [
         'Vrai expert immo ou vrai coup de chance ?',
@@ -727,8 +729,13 @@
         'Tu passes trop de temps sur SeLoger le dimanche soir.',
         'Dossier accepté sans garant, direct.',
         'Stéphane Plaza en sueur.',
-        'Tu as le bail sous les yeux, avoue.'
+        'Tu as le bail sous les yeux, avoue.',
+        'TOUT SIMPLEMENT FABULEUX'
       ];
+      // Si la manche précédente était moyenne ou faible (< 700 pts)
+      if (indexManche > 0 && scores[indexManche - 1] && scores[indexManche - 1].score < 700) {
+        subs.push('IL EST DE RETOUR !');
+      }
       return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(subs) };
     }
 
@@ -749,11 +756,15 @@
         'Ce marché vous réserve encore des surprises.',
         'Vous vous défendez bien !',
         'Pas loin !',
-        'Pas si loin, mais le proprio a été un poil plus gourmand.',
         'Tu as oublié de compter les charges de copro ?',
         'Le marché a encore quelques petits secrets pour toi.',
         'C\'est le supplément "charme de l\'ancien" qui t\'a trompé.'
       ];
+      if (ecart < 0) {
+        subs.push('Pas si loin, mais le proprio a été un poil plus gourmand.');
+      } else if (ecart > 0) {
+        subs.push('Pas si loin, mais le proprio a été un poil moins gourmand.');
+      }
       return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(subs) };
     }
 
@@ -762,6 +773,7 @@
         'Les loyers sont retors par ici…',
         'Le marché vous a eu cette fois !',
         'Difficile à estimer !',
+        'Crucifié…',
         'À ce prix-là, t\'as juste la cave et le local poubelles.',
         'Tu as estimé les prix en francs ou quoi ?'
       ];
@@ -775,6 +787,7 @@
       'Le marché n\'a pas fini de vous surprendre.',
       'Vous découvrez le marché immo français ?',
       'Revenez demain !',
+      'Crucifié…',
       'Dossier refusé immédiatement, même avec 12 garants en CDI.',
       'Complètement à côté de la plaque (et du département).'
     ];
@@ -790,7 +803,7 @@
     const score = calculerScore(estimation, a.loyer);
     const ecart = estimation - a.loyer;
     const ecartAbs = Math.abs(ecart);
-    const verdict = getVerdict(score, ecart);
+    const verdict = getVerdict(score, ecart, currentIndex);
     scores[currentIndex] = { estimation, score, ecart };
     sauvegarder();
     updateStoryHeader();
