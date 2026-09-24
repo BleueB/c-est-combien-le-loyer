@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /jeu.html
+Disallow: /admin.html
+
+Sitemap: https://bleueb.github.io/c-est-combien-le-loyer/sitemap.xml
