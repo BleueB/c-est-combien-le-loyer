@@ -1258,7 +1258,41 @@ const ANNONCES = [
     note: "Appartement de 3 pièces au 1er étage, avec entrée, séjour ouvrant sur une cuisine équipée, 2 chambres, salle de bains, WC et terrasse bien exposée. 2 places de stationnement.",
   },
 
+
+  // --- Jour 7 ---
+  {
+    id: 31,
+    jour: 7,
+    ville: "Saint-Raphaël",
+    titre: "Saint-Raphaël (83530)",
+    sous_titre: "Maison · Location meublée",
+    departement: "Var",
+    coords: [45.304308, 1.074717],
+    zoom: 16,
+    tooltip: "Saint-Raphaël (83530)",
+    loyer: 3800,
+    lien: "https://www.pap.fr/annonces/maison-saint-raphael-83530-r464701281",
+    source: "PAP",
+    badges: [
+      { label: "Surface", value: "170 m²" },
+      { label: "Pièces", value: "6 pièces · 4 ch." },
+      { label: "Étage", value: "" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "❌ Non" },
+      { label: "Extérieur", value: "Jardin" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entièrement rénové" },
+      { label: "DPE", value: "C · GES c" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🔇 Calme · 🏊 Piscine · ☀️ Lumineux",
+    note: "Maison de 170m², meublée et climatisée, avec piscine et jardin, dans un quartier calme de Saint-Raphaël (83530). Commerces et plage à 5 minutes en voiture. La villa est entièrement rénovée avec garages et stationnements.",
+  },
+
 ];
+
 
 
 
