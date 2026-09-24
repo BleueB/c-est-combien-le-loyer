@@ -1105,7 +1105,41 @@ const ANNONCES = [
     note: "Appartement de 3 pièces de 129 m² à Annecy, situé sur 2ème étage d'un immeuble de standing face au lac. Balcon avec vue lac et exposition plein sud. Inclut cave, parking privé et garage. Immeuble équipé d'ascenseur, interphone, digicode et local à vélos. Proche des réseaux de transports et commerces.",
   },
 
+
+  // --- Jour 6 ---
+  {
+    id: 26,
+    jour: 6,
+    ville: "Pontivy",
+    titre: "Pontivy (56300)",
+    sous_titre: "Le Four à Chaux - Appartement · Location vide",
+    departement: "Morbihan",
+    coords: [48.08054, -2.962487],
+    zoom: 16,
+    tooltip: "Pontivy (56300)",
+    loyer: 760,
+    lien: "https://www.bienici.com/annonce/location/pontivy/appartement/3pieces/immo-facile-61362425?q=%2Frecherche%2Flocation%2Fporspoder-29840%3Fcamera%3D12_-4.710413_48.5097633_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "59.42 m²" },
+      { label: "Pièces", value: "3 pièces · 2 ch." },
+      { label: "Étage", value: "1er" },
+      { label: "Meublé", value: "❌ Non" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Terrasse" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "C · GES A" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "",
+    note: "Appartement de 3 pièces au 1er étage, avec entrée, séjour ouvrant sur une cuisine équipée, 2 chambres, salle de bains, WC et terrasse bien exposée. 2 places de stationnement.",
+  },
+
 ];
+
 
 
 
