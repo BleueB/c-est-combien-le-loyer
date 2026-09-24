@@ -952,7 +952,41 @@ const ANNONCES = [
     note: "Appartement de 2 pièces à louer dans le centre-ville de Troyes. Inclut 1 chambre, cuisine équipée et cellier. Proximité de commerces et transports.",
   },
 
+
+  // --- Jour 5 ---
+  {
+    id: 21,
+    jour: 5,
+    ville: "Annecy",
+    titre: "Parmelan - Albigny, Annecy (74000)",
+    sous_titre: "Appartement · Location vide",
+    departement: "Haute-Savoie",
+    coords: [45.903985, 6.13656],
+    zoom: 16,
+    tooltip: "Parmelan - Albigny, Annecy (74000)",
+    loyer: 2595,
+    lien: "https://www.bienici.com/annonce/location/annecy/appartement/3pieces/ag743724-548051165?q=%2Frecherche%2Flocation%2Ffrance%3Fcamera%3D15_7.4160001_43.741291_0_0",
+    source: "Bien'ici",
+    badges: [
+      { label: "Surface", value: "129 m²" },
+      { label: "Pièces", value: "3 pièces · 2 ch." },
+      { label: "Étage", value: "2e" },
+      { label: "Meublé", value: "❌ Non" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Balcon" },
+      { label: "Année construction", value: "Non communiquée" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "D · GES D" },
+      { label: "Chauffage", value: "radiateur collectif" },
+      { label: "Exposition", value: "Non communiquée" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "⛵ Vue eau/lac . Cave",
+    note: "Appartement de 3 pièces de 129 m² à Annecy, situé sur 2ème étage d'un immeuble de standing face au lac. Balcon avec vue lac et exposition plein sud. Inclut cave, parking privé et garage. Immeuble équipé d'ascenseur, interphone, digicode et local à vélos. Proche des réseaux de transports et commerces.",
+  },
+
 ];
+
 
 
 
