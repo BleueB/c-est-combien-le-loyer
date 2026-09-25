@@ -224,12 +224,15 @@
       margin-bottom: 14px;
       letter-spacing: -0.5px;
     }
-    .slider-row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
-    input[type=range] { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 4px; background: #f0d8cc; outline: none; cursor: pointer; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #c4622d; border: 3px solid #fff; box-shadow: 0 1px 5px rgba(196,98,45,0.35); cursor: pointer; }
-    .amount-input { width: 106px; padding: 9px 10px; border: 1.5px solid #e8e4de; border-radius: 8px; font-size: 1rem; font-weight: 700; text-align: center; color: #1a1714; outline: none; transition: border-color 0.15s; }
-    .amount-input:focus { border-color: #c4622d; }
-    .slider-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #6b6560; margin-bottom: 20px; padding: 0 2px; }
+    .slider-row { margin-bottom: 10px; width: 100%; }
+    input[type=range] { width: 100%; -webkit-appearance: none; height: 8px; border-radius: 999px; background: #f0d8cc; outline: none; cursor: pointer; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #c4622d; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(196,98,45,0.4); cursor: pointer; transition: transform 0.1s; }
+    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.15); }
+    .quick-btns-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn-step { background: #fff; border: 1.5px solid #e8e4de; color: #1a1714; font-size: 0.85rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .btn-step:hover { border-color: #c4622d; color: #c4622d; background: #fff8f5; }
+    .btn-step:active { transform: scale(0.95); }
+    .slider-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #6b6560; margin-bottom: 16px; padding: 0 2px; }
     .btn-valider { width: 100%; padding: 14px; background: #c4622d; color: #fff; font-size: 1.05rem; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; letter-spacing: 0.01em; }
     .btn-valider:hover { background: #a8501f; }
     .resultat { display: none; margin-top: 24px; }
@@ -322,7 +325,7 @@
 <script>
   const SLIDER_MIN = 200;
   const SLIDER_MAX = 10000;
-  const SLIDER_DEFAULT = Math.round((SLIDER_MIN + SLIDER_MAX) / 2);
+  const SLIDER_DEFAULT = 1000;
   const NB_MANCHES = 5;
   const DATE_LANCEMENT = new Date(2026, 8, 23); // Date de lancement (mois 0-indexé : 8 = Septembre)
 
@@ -487,14 +490,18 @@
         <label>Ton estimation loyer charges comprises</label>
         <div class="price-display-center" id="priceDisplayCentred">${SLIDER_DEFAULT.toLocaleString('fr-FR')} €</div>
         <div class="slider-row">
-          <input type="range" id="slider" min="${SLIDER_MIN}" max="${SLIDER_MAX}" value="${SLIDER_DEFAULT}" step="50"
+          <input type="range" id="slider" min="${SLIDER_MIN}" max="${SLIDER_MAX}" value="${SLIDER_DEFAULT}" step="10"
             oninput="syncFromSlider(this.value)" />
-          <input type="number" id="montant" class="amount-input" value="${SLIDER_DEFAULT}"
-            min="${SLIDER_MIN}" max="${SLIDER_MAX}" oninput="syncFromInput(this.value)" />
+        </div>
+        <div class="quick-btns-row">
+          <button type="button" class="btn-step" onclick="adjustAmount(-50)">-50 €</button>
+          <button type="button" class="btn-step" onclick="adjustAmount(-10)">-10 €</button>
+          <button type="button" class="btn-step" onclick="adjustAmount(10)">+10 €</button>
+          <button type="button" class="btn-step" onclick="adjustAmount(50)">+50 €</button>
         </div>
         <div class="slider-labels">
           <span>${SLIDER_MIN.toLocaleString('fr-FR')} €</span>
-          <span>${Math.round((SLIDER_MIN + SLIDER_MAX) / 2).toLocaleString('fr-FR')} €</span>
+          <span>5 000 €</span>
           <span>${SLIDER_MAX.toLocaleString('fr-FR')} €</span>
         </div>
         <button class="btn-valider" onclick="valider()">Valider mon estimation →</button>
@@ -539,6 +546,7 @@
     }
 
     initMap(a);
+    currentVal = SLIDER_DEFAULT;
     updateSliderBg(SLIDER_DEFAULT);
   }
 
@@ -685,7 +693,9 @@
     map.addControl(new ResetControl());
   }
 
-  // --- SLIDER ---
+  // --- SLIDER & ESTIMATION ---
+  let currentVal = SLIDER_DEFAULT;
+
   function updateSliderBg(val) {
     const pct = ((val - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
     const slider = document.getElementById('slider');
@@ -694,19 +704,53 @@
         `linear-gradient(to right, #c4622d 0%, #c4622d ${pct}%, #f0d8cc ${pct}%, #f0d8cc 100%)`;
     }
   }
+
   function syncFromSlider(val) {
-    document.getElementById('montant').value = val;
+    currentVal = Math.min(Math.max(parseInt(val) || SLIDER_MIN, SLIDER_MIN), SLIDER_MAX);
     const priceEl = document.getElementById('priceDisplayCentred');
-    if (priceEl) priceEl.textContent = Number(val).toLocaleString('fr-FR') + ' €';
-    updateSliderBg(val);
+    if (priceEl) priceEl.textContent = currentVal.toLocaleString('fr-FR') + ' €';
+    updateSliderBg(currentVal);
   }
-  function syncFromInput(val) {
-    const v = Math.min(Math.max(parseInt(val) || SLIDER_MIN, SLIDER_MIN), SLIDER_MAX);
-    document.getElementById('slider').value = v;
+
+  function adjustAmount(delta) {
+    currentVal = Math.min(Math.max((currentVal || SLIDER_DEFAULT) + delta, SLIDER_MIN), SLIDER_MAX);
+    const slider = document.getElementById('slider');
+    if (slider) slider.value = currentVal;
     const priceEl = document.getElementById('priceDisplayCentred');
-    if (priceEl) priceEl.textContent = Number(v).toLocaleString('fr-FR') + ' €';
-    updateSliderBg(v);
+    if (priceEl) priceEl.textContent = currentVal.toLocaleString('fr-FR') + ' €';
+    updateSliderBg(currentVal);
   }
+
+  // Raccourcis clavier (←/→ : ±10€, Shift+←/→ : ±50€, Entrée : Valider)
+  window.addEventListener('keydown', (e) => {
+    const zoneEst = document.getElementById('zoneEstimation');
+    if (!zoneEst || zoneEst.style.display === 'none') {
+      if (e.key === 'Enter') {
+        const btnSuiv = document.getElementById('btnSuivante');
+        const btnRecap = document.getElementById('btnRecap');
+        if (btnSuiv && btnSuiv.style.display !== 'none') btnSuiv.click();
+        else if (btnRecap && btnRecap.style.display !== 'none') btnRecap.click();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      adjustAmount(e.shiftKey ? -50 : -10);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      adjustAmount(e.shiftKey ? 50 : 10);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      adjustAmount(-50);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      adjustAmount(50);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      valider();
+    }
+  });
 
   // --- SCORE ---
   function calculerScore(estimation, reel) {
@@ -733,7 +777,7 @@
         'TOUT SIMPLEMENT FABULEUX'
       ];
       // Si la manche précédente était moyenne ou faible (< 700 pts)
-      if (indexManche > 0 && scores[indexManche - 1] && scores[indexManche - 1].score < 700) {
+      if (indexManche > 0 && scores[indexManche - 1] && scores[indexManche - 1].score < 500) {
         subs.push('IL EST DE RETOUR !');
       }
       return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(subs) };
@@ -798,7 +842,8 @@
   }
 
   function valider() {
-    const estimation = parseInt(document.getElementById('montant').value) || SLIDER_DEFAULT;
+    const sliderEl = document.getElementById('slider');
+    const estimation = currentVal || (sliderEl ? parseInt(sliderEl.value) : SLIDER_DEFAULT);
     const a = ordre[currentIndex];
     const score = calculerScore(estimation, a.loyer);
     const ecart = estimation - a.loyer;
