@@ -294,17 +294,34 @@
     .btn-annonce.source-lbc { color: #ff6e14; border-color: #ff6e14; }
     .btn-annonce.source-def { color: #c4622d; border-color: #c4622d; }
     .badge-source { display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 4px; border: 2px solid currentColor; line-height: 1.4; }
+    .stats-panel { background: #faf9f7; border: 1px solid #e8e4de; border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+    .stats-panel-title { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.09em; color: #6b6560; margin-bottom: 12px; }
+    .stats-inline-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+    .stat-inline-cell { text-align: center; }
+    .sic-val { font-size: 1.5rem; font-weight: 900; color: #1a1714; line-height: 1; }
+    .sic-val.fire { color: #c4622d; }
+    .sic-lbl { font-size: 0.62rem; color: #6b6560; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 3px; }
+    .streak-banner { background: #fff8f5; border: 1px solid #f0d8cc; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .sb-fire { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+    .sb-text { flex: 1; min-width: 0; }
+    .sb-main { font-size: 0.85rem; font-weight: 800; color: #c4622d; }
+    .sb-sub { font-size: 0.72rem; color: #6b6560; margin-top: 2px; }
+    .countdown-block { text-align: center; padding: 10px 0 4px; }
+    .countdown-label { font-size: 0.72rem; color: #6b6560; font-weight: 700; margin-bottom: 4px; }
+    .countdown-timer { font-size: 1.6rem; font-weight: 900; color: #1a1714; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; line-height: 1; }
+    .btn-jouer-maintenant { width: 100%; padding: 13px; background: #16a34a; color: #fff; font-size: 0.95rem; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; margin-bottom: 10px; display: none; }
+    .btn-jouer-maintenant:hover { background: #15803d; }
     .btn-partager { width: 100%; padding: 13px; background: #1a1714; color: #fff; font-size: 0.95rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
     .btn-partager:hover { background: #333; }
     .btn-suivante { width: 100%; padding: 13px; background: #c4622d; color: #fff; font-size: 0.95rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; margin-top: 10px; }
     .btn-suivante:hover { background: #a8501f; }
-    .recap-block { text-align: center; padding: 32px 20px 24px; }
-    .recap-emoji { font-size: 3rem; margin-bottom: 10px; }
-    .recap-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; color: #1a1714; }
-    .recap-sub { font-size: 0.9rem; color: #6b6560; margin-bottom: 24px; }
-    .recap-score-label { font-size: 0.82rem; color: #6b6560; margin-bottom: 4px; }
-    .recap-score { font-size: 3.5rem; font-weight: 900; color: #c4622d; line-height: 1; margin-bottom: 4px; }
-    .recap-score-max { font-size: 0.88rem; color: #6b6560; margin-bottom: 24px; }
+    .recap-block { text-align: center; padding: 18px 20px 14px; }
+    .recap-emoji { font-size: 2.2rem; margin-bottom: 6px; }
+    .recap-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 3px; color: #1a1714; }
+    .recap-sub { font-size: 0.85rem; color: #6b6560; margin-bottom: 14px; }
+    .recap-score-label { font-size: 0.78rem; color: #6b6560; margin-bottom: 2px; }
+    .recap-score { font-size: 2.4rem; font-weight: 900; color: #c4622d; line-height: 1; margin-bottom: 2px; }
+    .recap-score-max { font-size: 0.82rem; color: #6b6560; margin-bottom: 14px; }
     .recap-detail { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; text-align: left; }
     .recap-ligne { display: flex; justify-content: space-between; align-items: center; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; border: 1.5px solid transparent; }
     .recap-ligne.vert   { background: #f0fdf4; border-color: #86efac; }
@@ -417,7 +434,7 @@
         padding: 20px 10px 18px;
       }
       .recap-score {
-        font-size: 3rem;
+        font-size: 2.2rem;
       }
       .recap-ligne {
         padding: 8px 10px;
@@ -775,11 +792,89 @@
     // Variantes niçoises conservées : 'Tu débarques de Paris ?', 'En vacances dans la région, peut-être ?', 'Uno di noi !'
   }
 
+  // --- STATISTIQUES JOUEUR ---
+  function chargerStats() {
+    try {
+      return JSON.parse(localStorage.getItem('cctl_stats') || '{}');
+    } catch { return {}; }
+  }
+
+  function mettreAJourStats(totalScore) {
+    const stats = chargerStats();
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = `${yesterday.getFullYear()}-${yesterday.getMonth()}-${yesterday.getDate()}`;
+
+    // Mise à jour streak
+    let currentStreak = stats.currentStreak || 0;
+    let bestStreak = stats.bestStreak || 0;
+
+    if (stats.lastPlayedDate === todayStr) {
+      // Déjà joué aujourd'hui, on ne recompte pas
+    } else if (stats.lastPlayedDate === yesterdayStr) {
+      currentStreak += 1;
+    } else {
+      currentStreak = 1;
+    }
+    bestStreak = Math.max(bestStreak, currentStreak);
+
+    const totalGames = (stats.totalGames || 0) + (stats.lastPlayedDate === todayStr ? 0 : 1);
+    const totalScoreCumul = (stats.totalScoreCumul || 0) + (stats.lastPlayedDate === todayStr ? 0 : totalScore);
+
+    const newStats = { currentStreak, bestStreak, totalGames, totalScoreCumul, lastPlayedDate: todayStr };
+    localStorage.setItem('cctl_stats', JSON.stringify(newStats));
+    return newStats;
+  }
+
+  // --- COMPTE À REBOURS ---
+  let countdownInterval = null;
+
+  function startCountdown() {
+    function getSecondesRestantes() {
+      const now = new Date();
+      const minuit = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      return Math.max(0, Math.floor((minuit - now) / 1000));
+    }
+
+    function formaterTemps(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function tick() {
+      const restantes = getSecondesRestantes();
+      const timerEl = document.getElementById('countdownTimer');
+      const labelEl = document.getElementById('countdownLabel');
+      const btnJouer = document.getElementById('btnJouerMaintenant');
+      if (!timerEl) { clearInterval(countdownInterval); return; }
+
+      if (restantes <= 0) {
+        clearInterval(countdownInterval);
+        timerEl.style.display = 'none';
+        if (labelEl) labelEl.style.display = 'none';
+        if (btnJouer) btnJouer.style.display = 'block';
+      } else {
+        timerEl.textContent = formaterTemps(restantes);
+      }
+    }
+
+    if (countdownInterval) clearInterval(countdownInterval);
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
   function afficherRecap() {
     const total = scores.reduce((s, r) => s + r.score, 0);
     const max = NB_MANCHES * 1000;
     const v = getVerdictGlobal(total, max);
     if (typeof umami !== 'undefined') umami.track('partie-terminee', { score: total, jour: numJour });
+
+    // Mettre à jour les stats
+    const stats = mettreAJourStats(total);
 
     // Emojis style Wordle
     const emojisPartage = scores.map(r => {
@@ -806,6 +901,13 @@
         </div>`;
     }).join('');
 
+    // Streak banner
+    const streakMsg = stats.currentStreak >= 2
+      ? `${stats.currentStreak} jours de suite — continue !`
+      : 'Day One! Reviens demain pour continuer ta série !';
+    const bestMsg = stats.bestStreak > 1 ? `Meilleure série : ${stats.bestStreak} jour${stats.bestStreak > 1 ? 's' : ''}` : '';
+    const scoreMoyen = stats.totalGames > 0 ? Math.round(stats.totalScoreCumul / stats.totalGames).toLocaleString('fr-FR') : '—';
+
     document.getElementById('card').innerHTML = `
       <div class="recap-block">
         <div class="recap-emoji">${v.emoji}</div>
@@ -816,6 +918,37 @@
         <div class="recap-score-max">/ ${max.toLocaleString('fr-FR')} points</div>
       </div>
       <div class="recap-detail">${lignesHTML}</div>
+
+      <div class="stats-panel">
+        <div class="stats-panel-title">Mes statistiques</div>
+        <div class="stats-inline-grid">
+          <div class="stat-inline-cell">
+            <div class="sic-val">${stats.totalGames}</div>
+            <div class="sic-lbl">Parties</div>
+          </div>
+          <div class="stat-inline-cell">
+            <div class="sic-val">${scoreMoyen}</div>
+            <div class="sic-lbl">Score moyen</div>
+          </div>
+          <div class="stat-inline-cell">
+            <div class="sic-val fire">${stats.currentStreak}🔥</div>
+            <div class="sic-lbl">Série</div>
+          </div>
+        </div>
+        <div class="streak-banner">
+          <div class="sb-fire">🔥</div>
+          <div class="sb-text">
+            <div class="sb-main">${streakMsg}</div>
+            ${bestMsg ? `<div class="sb-sub">${bestMsg}</div>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="countdown-block">
+        <div class="countdown-label" id="countdownLabel">Prochaine partie dans</div>
+        <div class="countdown-timer" id="countdownTimer">—</div>
+      </div>
+      <button class="btn-jouer-maintenant" id="btnJouerMaintenant" onclick="location.reload()">Jouer maintenant →</button>
       <button class="btn-partager" onclick="partagerRecap(${total}, ${max}, '${emojisPartage}')">📤 Partager mon score</button>
     `;
 
@@ -823,6 +956,7 @@
     if (total > 4000) {
       setTimeout(fireVictoryCannons, 300);
     }
+    startCountdown();
     forceScrollTop();
 
     // Marquer comme terminé
