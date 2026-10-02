@@ -13,12 +13,16 @@
   <meta property="og:locale" content="fr_FR"/>
   <meta name="twitter:card" content="summary"/>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet"/>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="annonces.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: auto !important;
+    }
     body {
       font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
       background: #faf9f7; color: #1a1714;
@@ -206,13 +210,34 @@
     }
     .custom-house-pin {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+      cursor: pointer;
+      pointer-events: none;
+    }
+    .custom-house-pin-animated {
       animation: pinDrop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       transform-origin: bottom center;
+    }
+    .pin-emoji {
+      font-size: 22px;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.35));
+    }
+    .custom-tooltip-3d {
+      background: rgba(26, 23, 20, 0.92);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      white-space: nowrap;
+      pointer-events: none;
+      margin-bottom: 2px;
     }
 
     .divider { border: none; border-top: 1px solid #e8e4de; margin: 20px 0; }
@@ -295,12 +320,118 @@
     .nav-btn:hover { background: #f0d8cc; }
     .nav-btn:disabled { opacity: 0.3; cursor: default; }
     .nav-counter { font-size: 0.85rem; font-weight: 700; color: #6b6560; }
+
+    /* --- RESPONSIVE MOBILE OPTIMISÉ (< 480px) --- */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px 10px 36px;
+      }
+      header {
+        margin-bottom: 14px;
+      }
+      header h1 {
+        font-size: 1.35rem;
+      }
+      .live-score-pill {
+        font-size: 0.75rem;
+        padding: 3px 9px;
+      }
+      .card {
+        padding: 18px 14px;
+        border-radius: 14px;
+      }
+      .annonce-title {
+        font-size: 0.98rem;
+      }
+      .annonce-ville {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+      }
+      .map-wrap {
+        height: 180px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+      }
+      .badge-grid {
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .badge {
+        padding: 6px 8px;
+        border-radius: 8px;
+        gap: 6px;
+      }
+      .badge-icon {
+        font-size: 1rem;
+      }
+      .badge .label {
+        font-size: 0.54rem;
+      }
+      .badge .value {
+        font-size: 0.78rem;
+      }
+      .note {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        margin-bottom: 18px;
+        gap: 8px;
+      }
+      .price-display-center {
+        font-size: 2.3rem;
+        margin-bottom: 10px;
+      }
+      .quick-btns-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: 100%;
+        margin-bottom: 12px;
+      }
+      .btn-step {
+        width: 100%;
+        padding: 8px 0;
+        font-size: 0.82rem;
+        text-align: center;
+      }
+      .slider-labels {
+        font-size: 0.7rem;
+        margin-bottom: 14px;
+      }
+      .score-block {
+        padding: 20px 12px 16px;
+      }
+      .score-number {
+        font-size: 2.8rem;
+      }
+      .reveal-row {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+      }
+      .reveal-row .rl {
+        font-size: 0.76rem;
+      }
+      .reveal-row .rv {
+        font-size: 0.95rem;
+      }
+      .recap-block {
+        padding: 20px 10px 18px;
+      }
+      .recap-score {
+        font-size: 3rem;
+      }
+      .recap-ligne {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+    }
     footer { margin-top: 36px; text-align: center; font-size: 0.75rem; color: #b5afa8; border-top: 1px solid #e8e4de; padding-top: 14px; width: 100%; max-width: 640px; }
   </style>
 </head>
 <body>
 
-<header>
+<header id="gameHeader">
   <div class="header-top">
     <h1>🏠 C'est Combien Le Loyer ?</h1>
     <span class="live-score-pill" id="liveScorePill">✨ 0 pt</span>
@@ -322,7 +453,69 @@
 </header>
 
 <div class="card" id="card">
-  <p style="text-align:center;color:#57606a;padding:40px 0">Chargement…</p>
+  <div class="nav-bar">
+    <button class="nav-btn" id="btnNavPrev" onclick="goTo(currentIndex - 1)" disabled>← Précédente</button>
+    <span class="nav-counter" id="navCounter">1 / 5</span>
+    <button class="nav-btn" id="btnNavNext" onclick="goTo(currentIndex + 1)" disabled>Suivante →</button>
+  </div>
+  <div class="annonce-title" id="annonceTitleWrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span id="annonceTitleText">📍 Chargement…</span>
+    <span id="annonceDeptTag" style="background:#f0f2f5;color:#57606a;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;display:none"></span>
+  </div>
+  <div class="annonce-ville" id="annonceVilleText"></div>
+  <div class="map-wrap"><div id="map"></div></div>
+  <div class="badge-grid" id="badgeGridWrap"></div>
+  <div class="note" id="noteWrap" style="display:none"><span class="note-bubble-icon">💬</span><div class="note-text" id="noteText"></div></div>
+  <hr class="divider" />
+  <div class="estimation-zone" id="zoneEstimation">
+    <label>Ton estimation loyer charges comprises</label>
+    <div class="price-display-center" id="priceDisplayCentred">1 000 €</div>
+    <div class="slider-row">
+      <input type="range" id="slider" min="200" max="10000" value="1000" step="10"
+        oninput="syncFromSlider(this.value)" />
+    </div>
+    <div class="quick-btns-row">
+      <button type="button" class="btn-step" onclick="adjustAmount(-50)">-50 €</button>
+      <button type="button" class="btn-step" onclick="adjustAmount(-10)">-10 €</button>
+      <button type="button" class="btn-step" onclick="adjustAmount(10)">+10 €</button>
+      <button type="button" class="btn-step" onclick="adjustAmount(50)">+50 €</button>
+    </div>
+    <div class="slider-labels">
+      <span>200 €</span>
+      <span>5 000 €</span>
+      <span>10 000 €</span>
+    </div>
+    <button class="btn-valider" onclick="valider()">Valider mon estimation →</button>
+  </div>
+  <div class="resultat" id="resultat" style="display:none">
+    <div class="score-block">
+      <div class="emoji-verdict" id="emojiVerdict">🎯</div>
+      <div class="score-label">Votre score</div>
+      <div class="score-number" id="scoreAffiche">0</div>
+      <div class="score-max">/ 1 000 points</div>
+      <div class="verdict-text" id="verdictText"></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+    </div>
+    <div class="reveal-row">
+      <span class="rl">Votre estimation</span>
+      <span class="rv" id="estimAffiche">—</span>
+    </div>
+    <div class="reveal-row">
+      <span class="rl">Loyer réel (CC)</span>
+      <span class="rv green" id="loyerReel">—</span>
+    </div>
+    <div class="precision-wrap">
+      <div class="precision-label">Précision</div>
+      <div class="precision-bg"><div class="precision-fill" id="precisionFill"></div></div>
+    </div>
+    <div id="btnAnnonceWrap"></div>
+    <button class="btn-suivante" id="btnSuivante" style="display:none" onclick="goTo(currentIndex + 1)">
+      Annonce suivante →
+    </button>
+    <button class="btn-suivante" id="btnRecap" style="display:none;background:#7c5cd8" onclick="afficherRecap()">
+      Voir mon récap 🏁
+    </button>
+  </div>
 </div>
 
 <footer>
@@ -344,11 +537,9 @@
     'meublé': '🪑',
     'parking': '🚗',
     'extérieur': '🌿',
-    'année construction': '📅',
     'état': '✨',
     'dpe': '⚡',
     'chauffage': '🔥',
-    'exposition': '☀️',
     'transports': '🚇'
   };
 
@@ -472,90 +663,80 @@
   function renderAnnonce(a) {
     updateStoryHeader();
     const pos = currentIndex + 1;
-    const badgesHTML = a.badges.map(b =>
-      `<div class="badge"><span class="badge-icon">${getBadgeIcon(b.label)}</span><div class="badge-content"><span class="label">${b.label}</span><span class="value">${b.value}</span></div></div>`
-    ).join('');
 
-    document.getElementById('card').innerHTML = `
-      <div class="nav-bar">
-        <button class="nav-btn" onclick="goTo(currentIndex - 1)" ${currentIndex === 0 ? 'disabled' : ''}>← Précédente</button>
-        <span class="nav-counter">${pos} / ${NB_MANCHES}</span>
-        <button class="nav-btn" onclick="goTo(currentIndex + 1)" ${scores[currentIndex] === undefined || currentIndex === NB_MANCHES - 1 ? 'disabled' : ''}>Suivante →</button>
-      </div>
-      <div class="annonce-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span>📍 ${a.titre || (a.ville + (a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''))}</span>
-        ${getDepartement(a) ? `<span style="background:#f0f2f5;color:#57606a;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">${getDepartement(a)}</span>` : ''}
-      </div>
-      <div class="annonce-ville">${a.ville}${a.sous_titre ? ' · ' + a.sous_titre : ''}</div>
-      <div class="map-wrap"><div id="map"></div></div>
-      <div class="badge-grid">
-        ${badgesHTML}
-        ${a.particularites ? `<div class="badge badge-full"><span class="badge-icon">✨</span><div class="badge-content"><span class="label">Particularités</span><span class="value">${a.particularites}</span></div></div>` : ''}
-      </div>
-      ${a.note ? `<div class="note"><span class="note-bubble-icon">💬</span><div class="note-text">${a.note}</div></div>` : ''}
-      <hr class="divider" />
-      <div class="estimation-zone" id="zoneEstimation">
-        <label>Ton estimation loyer charges comprises</label>
-        <div class="price-display-center" id="priceDisplayCentred">${SLIDER_DEFAULT.toLocaleString('fr-FR')} €</div>
-        <div class="slider-row">
-          <input type="range" id="slider" min="${SLIDER_MIN}" max="${SLIDER_MAX}" value="${SLIDER_DEFAULT}" step="10"
-            oninput="syncFromSlider(this.value)" />
-        </div>
-        <div class="quick-btns-row">
-          <button type="button" class="btn-step" onclick="adjustAmount(-50)">-50 €</button>
-          <button type="button" class="btn-step" onclick="adjustAmount(-10)">-10 €</button>
-          <button type="button" class="btn-step" onclick="adjustAmount(10)">+10 €</button>
-          <button type="button" class="btn-step" onclick="adjustAmount(50)">+50 €</button>
-        </div>
-        <div class="slider-labels">
-          <span>${SLIDER_MIN.toLocaleString('fr-FR')} €</span>
-          <span>5 000 €</span>
-          <span>${SLIDER_MAX.toLocaleString('fr-FR')} €</span>
-        </div>
-        <button class="btn-valider" onclick="valider()">Valider mon estimation →</button>
-      </div>
-      <div class="resultat" id="resultat" style="display:none">
-        <div class="score-block">
-          <div class="emoji-verdict" id="emojiVerdict">🎯</div>
-          <div class="score-label">Votre score</div>
-          <div class="score-number" id="scoreAffiche">0</div>
-          <div class="score-max">/ 1 000 points</div>
-          <div class="verdict-text" id="verdictText"></div>
-          <div class="verdict-sub" id="verdictSub"></div>
-        </div>
-        <div class="reveal-row">
-          <span class="rl">Votre estimation</span>
-          <span class="rv" id="estimAffiche">—</span>
-        </div>
-        <div class="reveal-row">
-          <span class="rl">Loyer réel (CC)</span>
-          <span class="rv green" id="loyerReel">${a.loyer.toLocaleString('fr-FR')} €/mois</span>
-        </div>
-        <div class="precision-wrap">
-          <div class="precision-label">Précision</div>
-          <div class="precision-bg"><div class="precision-fill" id="precisionFill"></div></div>
-        </div>
-        ${a.lien ? `<a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" onclick="trackVoirAnnonce(this)">
-          <span class="badge-source">${sourceAbbrev(a.source)}</span>
-          Voir les photos de l'annonce
-        </a>` : ''}
-        <button class="btn-suivante" id="btnSuivante" style="display:none" onclick="goTo(currentIndex + 1)">
-          Annonce suivante →
-        </button>
-        <button class="btn-suivante" id="btnRecap" style="display:none;background:#7c5cd8" onclick="afficherRecap()">
-          Voir mon récap 🏁
-        </button>
-      </div>
-    `;
+    // Mise à jour de la barre de nav
+    const btnPrev = document.getElementById('btnNavPrev');
+    const btnNext = document.getElementById('btnNavNext');
+    const navCounter = document.getElementById('navCounter');
+    if (btnPrev) btnPrev.disabled = (currentIndex === 0);
+    if (btnNext) btnNext.disabled = (scores[currentIndex] === undefined || currentIndex === NB_MANCHES - 1);
+    if (navCounter) navCounter.textContent = `${pos} / ${NB_MANCHES}`;
 
-    // Restaurer résultat si déjà joué
-    if (scores[currentIndex] !== undefined) {
-      afficherResultatExistant(scores[currentIndex], a);
+    // Mise à jour Titre & Ville
+    const titleText = document.getElementById('annonceTitleText');
+    if (titleText) titleText.textContent = `📍 ${a.titre || (a.ville + (a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''))}`;
+
+    const dept = getDepartement(a);
+    const deptTag = document.getElementById('annonceDeptTag');
+    if (deptTag) {
+      if (dept) {
+        deptTag.textContent = dept;
+        deptTag.style.display = 'inline-block';
+      } else {
+        deptTag.style.display = 'none';
+      }
     }
 
-    initMap(a);
+    const villeEl = document.getElementById('annonceVilleText');
+    if (villeEl) villeEl.textContent = `${a.ville}${a.sous_titre ? ' · ' + a.sous_titre : ''}`;
+
+    // Mise à jour Badges
+    const badgesHTML = a.badges.map(b =>
+      `<div class="badge"><span class="badge-icon">${getBadgeIcon(b.label)}</span><div class="badge-content"><span class="label">${b.label}</span><span class="value">${b.value}</span></div></div>`
+    ).join('') + (a.particularites ? `<div class="badge badge-full"><span class="badge-icon">✨</span><div class="badge-content"><span class="label">Particularités</span><span class="value">${a.particularites}</span></div></div>` : '');
+    const badgeGrid = document.getElementById('badgeGridWrap');
+    if (badgeGrid) badgeGrid.innerHTML = badgesHTML;
+
+    // Mise à jour Note
+    const noteWrap = document.getElementById('noteWrap');
+    const noteText = document.getElementById('noteText');
+    if (noteWrap && noteText) {
+      if (a.note) {
+        noteText.textContent = a.note;
+        noteWrap.style.display = 'flex';
+      } else {
+        noteWrap.style.display = 'none';
+      }
+    }
+
+    // Réinitialiser la zone d'estimation et le slider
     currentVal = SLIDER_DEFAULT;
+    const slider = document.getElementById('slider');
+    if (slider) slider.value = SLIDER_DEFAULT;
+    const priceDisplay = document.getElementById('priceDisplayCentred');
+    if (priceDisplay) priceDisplay.textContent = `${SLIDER_DEFAULT.toLocaleString('fr-FR')} €`;
     updateSliderBg(SLIDER_DEFAULT);
+
+    // Bouton Voir l'annonce
+    const btnAnnonceWrap = document.getElementById('btnAnnonceWrap');
+    if (btnAnnonceWrap) {
+      btnAnnonceWrap.innerHTML = a.lien ? `
+        <a href="${a.lien}" target="_blank" rel="noopener" class="btn-annonce ${sourceCssClass(a.source)}" onclick="trackVoirAnnonce(this)">
+          <span class="badge-source">${sourceAbbrev(a.source)}</span>
+          Voir les photos de l'annonce
+        </a>` : '';
+    }
+
+    // Restaurer résultat si déjà joué ou afficher le formulaire d'estimation
+    if (scores[currentIndex] !== undefined) {
+      afficherResultatExistant(scores[currentIndex], a);
+    } else {
+      document.getElementById('zoneEstimation').style.display = 'block';
+      document.getElementById('resultat').style.display = 'none';
+    }
+
+    // Initialisation ou transition flyTo sur la carte existante
+    initMap(a);
   }
 
   function afficherResultatExistant(r, a) {
@@ -639,7 +820,10 @@
     `;
 
     animerScoreEl(document.getElementById('recapScoreAnim'), total);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (total > 4000) {
+      setTimeout(fireVictoryCannons, 300);
+    }
+    forceScrollTop();
 
     // Marquer comme terminé
     sauvegarder();
@@ -671,34 +855,114 @@
     }
   }
 
-  // --- MAP ---
+  // --- MAPBOX 3D (Streets-v12) ---
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmxldWViIiwiYSI6ImNtdXFwa3l3ajAwMzQyd3BpMDZvYWVkdnIifQ.NgG1-eQ8nRatu40mDtS8dA';
+  let mapboxInstance = null;
+  let mapboxMarker = null;
+
   function initMap(a) {
-    const map = L.map('map', { zoomControl: true, scrollWheelZoom: false, dragging: true, attributionControl: false }).setView(a.coords, a.zoom || 15);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19
-    }).addTo(map);
-    L.control.attribution({ prefix: 'Tiles © Esri' }).addTo(map);
-    map.on('click', () => map.scrollWheelZoom.enable());
-    map.on('mouseout', () => map.scrollWheelZoom.disable());
-    const pinIcon = L.divIcon({
-      html: '<div class="custom-house-pin">📍</div>',
-      className: '', iconSize: [26, 26], iconAnchor: [13, 24]
-    });
-    L.marker(a.coords, { icon: pinIcon }).addTo(map)
-      .bindTooltip(a.tooltip || a.ville, { permanent: true, direction: 'top', offset: [0,-22] });
-    const ResetControl = L.Control.extend({
-      options: { position: 'topright' },
-      onAdd: () => {
-        const btn = L.DomUtil.create('button');
-        btn.innerHTML = '⌖';
-        btn.style.cssText = 'background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;width:30px;height:30px;font-size:1.1rem;cursor:pointer;line-height:1;color:#444;';
-        btn.onmouseover = () => btn.style.background = '#f4f4f4';
-        btn.onmouseout  = () => btn.style.background = '#fff';
-        L.DomEvent.on(btn, 'click', () => map.setView(a.coords, a.zoom || 15));
-        return btn;
+    const coordsLngLat = [a.coords[1], a.coords[0]];
+    const targetZoom = a.zoom ? Math.max(a.zoom + 0.8, 16) : 16.3;
+
+    if (!mapboxInstance) {
+      if (typeof umami !== 'undefined') {
+        umami.track('carte-chargee', { style: 'streets-v12', jour: numJour });
       }
-    });
-    map.addControl(new ResetControl());
+
+      mapboxInstance = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: coordsLngLat,
+        zoom: targetZoom,
+        pitch: 52,
+        bearing: -12,
+        antialias: true,
+        trackResize: false,
+        keyboard: false
+      });
+
+      mapboxInstance.addControl(new mapboxgl.NavigationControl({ showCompass: true, visualizePitch: true }), 'top-right');
+
+      mapboxInstance.on('style.load', () => {
+        ajouterBatiments3D();
+        placerMarker(a);
+      });
+    } else {
+      // Grand survol aérien avec dézoom/rezoom fluide à travers la France (légèrement plus véloce)
+      mapboxInstance.flyTo({
+        center: coordsLngLat,
+        zoom: targetZoom,
+        pitch: 52,
+        bearing: -12 + (Math.random() * 8 - 4),
+        speed: 1.45,
+        curve: 1.4,
+        essential: true
+      });
+      placerMarker(a);
+    }
+  }
+
+  function ajouterBatiments3D() {
+    if (!mapboxInstance || !mapboxInstance.getStyle()) return;
+    const layers = mapboxInstance.getStyle().layers;
+    const labelLayerId = layers.find(
+      (layer) => layer.type === 'symbol' && layer.layout && layer.layout['text-field']
+    )?.id;
+
+    if (!mapboxInstance.getLayer('add-3d-buildings')) {
+      mapboxInstance.addLayer(
+        {
+          id: 'add-3d-buildings',
+          source: 'composite',
+          'source-layer': 'building',
+          filter: ['==', 'extrude', 'true'],
+          type: 'fill-extrusion',
+          minzoom: 14,
+          paint: {
+            'fill-extrusion-color': '#d1d5db',
+            'fill-extrusion-height': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              14,
+              0,
+              15.05,
+              ['get', 'height']
+            ],
+            'fill-extrusion-base': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              14,
+              0,
+              15.05,
+              ['get', 'min_height']
+            ],
+            'fill-extrusion-opacity': 0.65
+          }
+        },
+        labelLayerId
+      );
+    }
+  }
+
+  function placerMarker(a) {
+    if (mapboxMarker) {
+      mapboxMarker.remove();
+    }
+    const coordsLngLat = [a.coords[1], a.coords[0]];
+    const el = document.createElement('div');
+    el.className = 'custom-house-pin';
+    el.innerHTML = `
+      <div class="custom-house-pin-animated" style="display:flex;flex-direction:column;align-items:center">
+        <div class="custom-tooltip-3d">${a.tooltip || a.ville}</div>
+        <div class="pin-emoji">📍</div>
+      </div>
+    `;
+
+    mapboxMarker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+      .setLngLat(coordsLngLat)
+      .addTo(mapboxInstance);
   }
 
   // --- SLIDER & ESTIMATION ---
@@ -762,9 +1026,33 @@
 
   // --- SCORE ---
   function calculerScore(estimation, reel) {
-    const ecart = Math.abs(estimation - reel);
-    const sigma = reel * 0.25;
-    return Math.round(1000 * Math.exp(-(ecart * ecart) / (2 * sigma * sigma)));
+    const ecartPct = Math.abs(estimation - reel) / reel;
+    if (ecartPct <= 0.03) return 1000; // À 3% près = score maximal parfait
+    const sigma = 0.38; // Courbe douce et récompensante
+    const score = 1000 * Math.exp(-Math.pow(ecartPct - 0.03, 2) / (2 * sigma * sigma));
+    return Math.round(Math.max(score, 0));
+  }
+
+  // --- CONFETTIS ---
+  function fireConfettiManche() {
+    if (typeof confetti === 'undefined') return;
+    confetti({
+      particleCount: 50,
+      spread: 55,
+      origin: { y: 0.65 },
+      colors: ['#c4622d', '#16a34a', '#f59e0b', '#3b82f6', '#ec4899']
+    });
+  }
+
+  function fireVictoryCannons() {
+    if (typeof confetti === 'undefined') return;
+    const end = Date.now() + 1400;
+    const colors = ['#c4622d', '#16a34a', '#f59e0b', '#3b82f6'];
+    (function frame() {
+      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors });
+      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }());
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -866,10 +1154,14 @@
     document.getElementById('verdictSub').textContent = verdict.sub;
     document.getElementById('estimAffiche').textContent = estimation.toLocaleString('fr-FR') + ' €';
     const colorClass = ecartAbs <= 50 ? 'green' : ecartAbs <= 150 ? 'orange' : 'red';
-    const ecartStr = (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' €';
+    const diffPct = ((ecart / a.loyer) * 100).toFixed(1);
+    const ecartStr = (ecart >= 0 ? '+' : '') + ecart.toLocaleString('fr-FR') + ' € / ' + (ecart >= 0 ? '+' : '') + diffPct + '%';
     document.getElementById('loyerReel').innerHTML = `${a.loyer.toLocaleString('fr-FR')} €/mois <span style="font-size:0.82rem;font-weight:600" class="${colorClass}">(${ecartStr})</span>`;
     setTimeout(() => { document.getElementById('precisionFill').style.width = (score / 10) + '%'; }, 120);
     animerScore(score);
+    if (score >= 900) {
+      setTimeout(fireConfettiManche, 200);
+    }
     const scoreBlock = document.querySelector('.score-block');
     if (scoreBlock) {
       scoreBlock.classList.remove('low-score', 'high-score');
@@ -897,11 +1189,25 @@
   }
 
   // --- NAVIGATION ---
+  function forceScrollTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+
   function goTo(index) {
     if (index < 0 || index >= NB_MANCHES) return;
     currentIndex = index;
+
+    // Retirer le focus de tout bouton actif pour empêcher le navigateur de recentrer la vue
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+
     renderAnnonce(ordre[currentIndex]);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    forceScrollTop();
+    requestAnimationFrame(forceScrollTop);
+    [20, 60, 150, 300, 600].forEach(d => setTimeout(forceScrollTop, d));
   }
 
   // --- INIT ---
