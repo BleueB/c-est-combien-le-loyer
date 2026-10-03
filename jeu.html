@@ -898,16 +898,15 @@
 
     // Emojis style Wordle
     const emojisPartage = scores.map(r => {
-      const pct = r.score / 1000;
-      if (pct >= 0.9) return '🟩';
-      if (pct >= 0.6) return '🟨';
+      if (r.score >= 900) return '🟩';
+      if (r.score >= 700) return '🟨';
       return '🟥';
     }).join('');
 
     const lignesHTML = scores.map((r, i) => {
       const a = ordre[i];
       const ecartStr = (r.ecart >= 0 ? '+' : '') + r.ecart.toLocaleString('fr-FR') + ' €';
-      const couleur = r.score >= 700 ? 'vert' : r.score >= 300 ? 'orange' : 'rouge';
+      const couleur = r.score >= 900 ? 'vert' : r.score >= 700 ? 'orange' : 'rouge';
       return `
         <div class="recap-ligne ${couleur}">
           <span class="rl" style="flex:1;min-width:0;margin-right:10px">${i + 1}. ${a.ville}${a.tooltip && a.tooltip !== a.ville ? ' · ' + a.tooltip : ''}</span>
