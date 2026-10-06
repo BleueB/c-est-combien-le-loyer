@@ -2215,7 +2215,7 @@ const ANNONCES = [
   {
     id: 71,
     jour: 14,
-    ville: "Location AppartementLocation immobilier AppartementBièvres",
+    ville: "Bièvres",
     titre: "Bièvres (91570)",
     sous_titre: "Maison · Location meublée",
     departement: "Essonne",
@@ -4051,7 +4051,39 @@ const ANNONCES = [
     note: "prestigieux quartier d'Auteuil Sud, cet appartement offre une vue panoramique exceptionnelle sur Paris, avec la Tour Eiffel en ligne de mire. Au 8e étage d'un immeuble sécurisé avec gardienne, vous profiterez d'un séjour spacieux ouvrant sur un balcon idéal pour savourer le panorama. Cet appartement de 103,79 m², entièrement meublé, dispose de trois chambres, d'une cuisine indépendante et de deux salles d'eau, offrant un confort optimal",
   },
 
+
+  // --- Jour 24 ---
+  {
+    id: 128,
+    jour: 24,
+    ville: "Poitiers",
+    titre: "Poitiers (86000)",
+    sous_titre: "Duplex · Location",
+    departement: "Vienne",
+    coords: [46.58026, 0.340196],
+    zoom: 16,
+    tooltip: "Poitiers (86000)",
+    loyer: 996,
+    lien: "https://www.seloger.com/annonce/location/nouvelle-aquitaine/vienne-86/poitiers-86000/26YZ5JWBE9FB?serp_view=map&search=distributionTypes%3DRent%26estateTypes%3DApartment%26initialQuery%3Dappartement%26locations%3DAD02FR1%26method%3Dtext#ln=classified_search_results_map_list&m=classified_search_results_map_list_classified_classified_detail_M",
+    source: "SeLoger",
+    badges: [
+      { label: "Surface", value: "93.71 m²" },
+      { label: "Pièces", value: "4 pièces · 3 ch." },
+      { label: "Étage", value: "" },
+      { label: "Meublé", value: "N/A" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Terrasse" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "Classe D" },
+      { label: "Chauffage", value: "individuel électrique" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🌿 Terrasse",
+    note: "Ce charmant appartement T4 situé au cœur de Trois-Quartiers, à proximité de la place Montierneuf, vous séduira par son cachet et son agencement unique. La terrasse accessible depuis le rez-de-chaussée offre un espace extérieur agréable pour profiter des beaux jours. L'étage abrite une mezzanine et deux chambres supplémentaires, complétant ce bien lumineux et fonctionnel. Vous êtes dans le futur(oscope)",
+  },
+
 ];
+
 
 
 
