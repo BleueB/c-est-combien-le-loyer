@@ -2216,12 +2216,12 @@ const ANNONCES = [
     id: 71,
     jour: 14,
     ville: "Location AppartementLocation immobilier AppartementBièvres",
-    titre: "Location AppartementLocation immobilier AppartementBièvres (91570)",
+    titre: "Bièvres (91570)",
     sous_titre: "Maison · Location meublée",
     departement: "Essonne",
     coords: [48.754768, 2.217015],
     zoom: 16,
-    tooltip: "Location AppartementLocation immobilier AppartementBièvres (91570)",
+    tooltip: "Bièvres (91570)",
     loyer: 1500,
     lien: "https://www.pap.fr/annonces/appartement-bievres-r187404131",
     source: "PAP",
@@ -2238,7 +2238,7 @@ const ANNONCES = [
       { label: "Transports", value: "🚇 Métro e" },
     ],
     particularites: "",
-    note: "Appartement 3 pièces, 68 m², meublé, Bievres (91570). Petite copropriété centrale, vue intérieure, terrasse, parking. Idéal pour couple ou 2 colocataires...",
+    note: "Appartement 3 pièces, 68 m², meublé, Bievres (91570). Petite copropriété centrale, vue intérieure, terrasse, parking. Idéal pour couple ou 2 colocataires...Comme vous voulez quoi",
   },
   {
     id: 70,
@@ -3908,7 +3908,39 @@ const ANNONCES = [
     note: "Situé dans une résidence sécurisée, cet appartement vous offre une vue dégagée et une ambiance lumineuse. Son coin cuisine aménagé et équipé ouvert sur le séjour vous permettra de partager de bons moments entre amis et en famille. Profitez également de la terrasse pour des moments de détente en plein air et d'une place de parking en garage sécurisé",
   },
 
+
+  // --- Jour 23 ---
+  {
+    id: 123,
+    jour: 23,
+    ville: "Paris 16e arr.",
+    titre: "Paris 16e arr. (75016)",
+    sous_titre: "Appartement · Location meublée",
+    departement: "Paris",
+    coords: [48.863634, 2.276485],
+    zoom: 16,
+    tooltip: "Paris 16e arr. (75016)",
+    loyer: 4425,
+    lien: "https://www.seloger.com/annonce/location/ile-de-france/paris-75/paris-75000/26BWRWBRQ9LB?serp_view=list&search=distributionTypes%3DRent%26estateTypes%3DApartment%26initialQuery%3Dappartement%26locations%3DAD02FR1%26method%3Dtext#ln=classified_search_results&m=classified_search_results_classified_classified_detail_XL",
+    source: "SeLoger",
+    badges: [
+      { label: "Surface", value: "117.62 m²" },
+      { label: "Pièces", value: "4 pièces · 3 ch." },
+      { label: "Étage", value: "8e · sans ascenseur" },
+      { label: "Meublé", value: "✅ Oui" },
+      { label: "Parking", value: "✅ Oui" },
+      { label: "Extérieur", value: "Balcon" },
+      { label: "État", value: "Entretenu" },
+      { label: "DPE", value: "Non communiqué" },
+      { label: "Chauffage", value: "Non communiqué" },
+      { label: "Transports", value: "Non communiqué" },
+    ],
+    particularites: "🌅 Vue panoramique",
+    note: "prestigieux quartier d'Auteuil Sud, cet appartement offre une vue panoramique exceptionnelle sur Paris, avec la Tour Eiffel en ligne de mire. Au 8e étage d'un immeuble sécurisé avec gardienne, vous profiterez d'un séjour spacieux ouvrant sur un balcon idéal pour savourer le panorama. Cet appartement de 103,79 m², entièrement meublé, dispose de trois chambres, d'une cuisine indépendante et de deux salles d'eau, offrant un confort optimal",
+  },
+
 ];
+
 
 
 
