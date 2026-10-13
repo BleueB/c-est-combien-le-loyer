@@ -50,7 +50,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 16px 48px;
+      padding: 20px 16px 32px;
     }
 
     .wrap {
@@ -88,7 +88,7 @@
     .hero-house-wrap {
       position: relative;
       display: inline-block;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
       line-height: 1;
     }
 
@@ -114,7 +114,7 @@
       font-size: 1.7rem;
       font-weight: 900;
       letter-spacing: -0.5px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       line-height: 1.2;
       color: #1a1714;
     }
@@ -122,16 +122,16 @@
     .tagline {
       font-size: 1.05rem;
       color: #6b6560;
-      margin-bottom: 20px;
-      line-height: 1.6;
+      margin-bottom: 14px;
+      line-height: 1.45;
     }
 
     .card {
       background: #fff;
       border: 1px solid #e8e4de;
       border-radius: 16px;
-      padding: 28px 24px;
-      margin-bottom: 20px;
+      padding: 20px 20px;
+      margin-bottom: 12px;
       text-align: left;
       box-shadow: 0 1px 4px rgba(26,23,20,0.06);
     }
@@ -142,7 +142,7 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: #c4622d;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .jour-titre {
@@ -150,7 +150,7 @@
       font-size: 1.15rem;
       font-weight: 900;
       color: #1a1714;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .jour-sub {
@@ -175,7 +175,7 @@
       transition: background 0.15s;
       letter-spacing: 0.01em;
       margin-top: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
     .btn-jouer:hover { background: #a8501f; }
 
@@ -186,6 +186,26 @@
       pointer-events: none;
     }
 
+    .btn-secondaire {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      background: #fff;
+      color: #1a1714;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 1.5px solid #e8e4de;
+      border-radius: 12px;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+    }
+    .btn-secondaire:hover { background: #faf9f7; }
+    .btn-secondaire small { color: #6b6560; font-weight: 600; }
+
     .deja-joue {
       background: #f0fdf4;
       border: 1px solid #bbf7d0;
@@ -195,19 +215,19 @@
       color: #15803d;
       font-weight: 600;
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .regles {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-bottom: 16px;
       text-align: left;
       background: #fff;
       border: 1px solid #e8e4de;
       border-radius: 14px;
-      padding: 16px 18px;
+      padding: 12px 16px;
     }
     .regle {
       display: flex;
@@ -233,10 +253,10 @@
     /* --- RESPONSIVE MOBILE OPTIMISÉ (< 480px) --- */
     @media (max-width: 480px) {
       body {
-        padding: 20px 12px 36px;
+        padding: 18px 12px 28px;
       }
       .hero-house-wrap {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
       }
       .hero-house-icon {
         font-size: 2.8rem;
@@ -248,7 +268,7 @@
       }
       h1 {
         font-size: 1.45rem;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
       .tagline strong {
         font-size: 1.05rem !important;
@@ -257,8 +277,8 @@
         font-size: 0.88rem !important;
       }
       .card {
-        padding: 16px 14px;
-        margin-bottom: 12px;
+        padding: 14px 14px;
+        margin-bottom: 8px;
       }
       .jour-titre {
         font-size: 1.25rem;
@@ -271,8 +291,8 @@
         font-size: 0.98rem;
       }
       .regles {
-        padding: 12px 14px;
-        gap: 9px;
+        padding: 10px 14px;
+        gap: 7px;
       }
       .regle {
         font-size: 0.8rem;
@@ -281,7 +301,7 @@
     }
 
     footer {
-      margin-top: 28px;
+      margin-top: 20px;
       font-size: 0.75rem;
       color: #b5afa8;
     }
@@ -307,6 +327,8 @@
   </div>
 
   <a href="jeu.html" class="btn-jouer" id="btnJouer">Jouer la partie du jour →</a>
+
+  <a href="archives.html" class="btn-secondaire" id="btnArchives">📚 Parties précédentes <small id="archivesCount"></small></a>
 
   <div class="regles">
     <div class="regle"><span class="regle-icon">📍</span><span>Une carte pour situer le logement</span></div>
@@ -363,8 +385,18 @@
   function aDejaJoue(numJour) {
     try {
       const data = JSON.parse(localStorage.getItem('cctl_quotidien') || '{}');
-      return data.jour === numJour && data.termine === true;
+      // `termine` n'était jamais vrai avant la correction : on se fie aussi au nombre de scores
+      return data.jour === numJour && (data.termine === true || (data.scores || []).length >= NB_MANCHES);
     } catch { return false; }
+  }
+
+  // Archives = jours passés avec une grille complète de 5 annonces
+  function nbArchives(jourCourant) {
+    let n = 0;
+    for (let j = 1; j < jourCourant; j++) {
+      if (getAnnoncesDuJour(j).length >= NB_MANCHES) n++;
+    }
+    return n;
   }
 
   const numJour = getNumJour();
@@ -372,6 +404,12 @@
 
   // Afficher le numéro du jour
   document.getElementById('jourTitre').textContent = `Partie #${numJour}`;
+
+  const nbArch = nbArchives(numJour);
+  if (nbArch > 0) {
+    document.getElementById('btnArchives').style.display = 'flex';
+    document.getElementById('archivesCount').textContent = `· ${nbArch} disponible${nbArch > 1 ? 's' : ''}`;
+  }
 
   if (annonces.length < NB_MANCHES) {
     document.getElementById('jourSub').textContent = 'Pas encore disponible — revenez bientôt !';

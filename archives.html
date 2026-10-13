@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>"/>
+  <title>Archives — C'est Combien Le Loyer ? 🏠</title>
+  <link rel="canonical" href="https://bleueb.github.io/c-est-combien-le-loyer/archives.html" />
+  <meta name="description" content="Rejoue les parties passées de C'est Combien Le Loyer ? : 5 annonces, 5 loyers à deviner."/>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
+  <script src="annonces.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: #faf9f7;
+      color: #1a1714;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+    .wrap { max-width: 480px; width: 100%; }
+
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .back { font-size: 0.85rem; font-weight: 700; color: #3b82d4; text-decoration: none; min-width: 80px; }
+    h1 { font-size: 1.35rem; font-weight: 900; letter-spacing: -0.3px; }
+    .spacer { min-width: 80px; }
+
+    .intro { font-size: 0.85rem; color: #6b6560; line-height: 1.5; margin-bottom: 14px; }
+
+    .sumbar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .sum { background: #fff; border: 1px solid #e8e4de; border-radius: 12px; padding: 10px 6px; text-align: center; }
+    .sum .v { font-size: 1.15rem; font-weight: 900; }
+    .sum .l { font-size: 0.62rem; color: #6b6560; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+    .list { display: flex; flex-direction: column; gap: 8px; }
+    .row {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1px solid #e8e4de; border-radius: 12px;
+      padding: 12px 14px; text-decoration: none; color: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .row:hover { border-color: #c4622d; }
+    .row.done { background: #fcfbf9; }
+    .num { font-size: 1rem; font-weight: 900; min-width: 42px; }
+    .mid { flex: 1; min-width: 0; }
+    .date { font-size: 0.72rem; color: #6b6560; font-weight: 700; }
+    .villes { font-size: 0.78rem; color: #57606a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sq { font-size: 0.75rem; letter-spacing: 1px; margin-top: 2px; }
+    .right { text-align: right; flex-shrink: 0; }
+    .pts { font-size: 0.95rem; font-weight: 900; color: #c4622d; }
+    .pts small { font-size: 0.62rem; color: #6b6560; font-weight: 700; }
+    .pill-play { display: inline-block; background: #c4622d; color: #fff; font-size: 0.76rem; font-weight: 800; padding: 6px 12px; border-radius: 999px; }
+    .pill-cont { display: inline-block; background: #fff8f5; color: #c4622d; border: 1px solid #f0d8cc; font-size: 0.76rem; font-weight: 800; padding: 5px 11px; border-radius: 999px; }
+
+    .vide { text-align: center; padding: 40px 14px; background: #fff; border: 1px solid #e8e4de; border-radius: 16px; }
+    .vide .big { font-size: 2.2rem; margin-bottom: 8px; }
+    .vide .t { font-weight: 800; margin-bottom: 4px; }
+    .vide .s { font-size: 0.85rem; color: #6b6560; }
+
+    .mois { background: #fff; border: 1px solid #e8e4de; border-radius: 14px; }
+    .mois summary {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      padding: 12px 14px; list-style: none; font-weight: 800; font-size: 0.95rem;
+    }
+    .mois summary::-webkit-details-marker { display: none; }
+    .mois summary::before { content: '▸'; color: #c4622d; transition: transform 0.15s; }
+    .mois[open] summary::before { transform: rotate(90deg); }
+    .mois-compte { margin-left: auto; font-size: 0.72rem; color: #6b6560; font-weight: 700; }
+    .mois-liste { display: flex; flex-direction: column; gap: 8px; padding: 0 10px 10px; }
+
+    footer { margin-top: 28px; font-size: 0.75rem; color: #b5afa8; }
+    footer a { color: #b5afa8; text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="index.html" class="back">← Accueil</a>
+    <h1>📚 Archives</h1>
+    <span class="spacer"></span>
+  </div>
+
+  <p class="intro">Rejoue les parties passées. Elles ne comptent pas dans tes statistiques ni dans ta série.</p>
+
+  <div class="sumbar" id="sumbar" style="display:none">
+    <div class="sum"><div class="v" id="sumJouees">—</div><div class="l">Jouées</div></div>
+    <div class="sum"><div class="v" id="sumMoyen">—</div><div class="l">Score moyen</div></div>
+    <div class="sum"><div class="v" id="sumMeilleur">—</div><div class="l">Meilleur</div></div>
+  </div>
+
+  <div class="list" id="liste"></div>
+</div>
+
+<footer><a href="index.html">C'est Combien Le Loyer ?</a> — Nouvelle partie chaque jour à minuit</footer>
+
+<script>
+  const DATE_LANCEMENT = new Date(2026, 8, 23); // Date de lancement (mois 0-indexé : 8 = Septembre)
+  const NB_MANCHES = 5;
+
+  function getJourCourant() {
+    const testJour = parseInt(localStorage.getItem('cctl_testJour') || '');
+    if (!isNaN(testJour) && testJour > 0) return testJour;
+    const today = new Date();
+    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diff = Math.round((todayLocal - DATE_LANCEMENT) / 86400000) + 1;
+    return Math.max(diff, 1);
+  }
+
+  function dateObj(num) {
+    return new Date(DATE_LANCEMENT.getFullYear(), DATE_LANCEMENT.getMonth(), DATE_LANCEMENT.getDate() + num - 1);
+  }
+
+  function dateDuJour(num) {
+    return dateObj(num).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function lireArchives() {
+    try { return JSON.parse(localStorage.getItem('cctl_archives') || '{}') || {}; } catch { return {}; }
+  }
+
+  // Sécurise l'affichage : les valeurs viennent de annonces.js, pas de l'utilisateur, mais on échappe par principe
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function carre(score) {
+    return score >= 900 ? '🟩' : score >= 700 ? '🟨' : '🟥';
+  }
+
+  const jourCourant = getJourCourant();
+
+  // Migration : la dernière partie du jour d'un jour passé est copiée dans les archives avant d'être écrasée
+  try {
+    const q = JSON.parse(localStorage.getItem('cctl_quotidien') || '{}');
+    const arch = lireArchives();
+    if (q.jour < jourCourant && (q.scores || []).length && !arch[q.jour]) {
+      arch[q.jour] = q;
+      localStorage.setItem('cctl_archives', JSON.stringify(arch));
+    }
+  } catch {}
+
+  const archives = lireArchives();
+  const liste = document.getElementById('liste');
+
+  // Jours passés avec une grille complète, du plus récent au plus ancien
+  const jours = [];
+  for (let j = jourCourant - 1; j >= 1; j--) {
+    const annonces = ANNONCES.filter(a => a.jour === j);
+    if (annonces.length >= NB_MANCHES) jours.push({ jour: j, annonces });
+  }
+
+  if (!jours.length) {
+    liste.innerHTML = `
+      <div class="vide">
+        <div class="big">🗓️</div>
+        <div class="t">Pas encore d'archives</div>
+        <div class="s">Les parties passées apparaîtront ici dès demain.</div>
+      </div>`;
+  } else {
+    const terminees = [];
+
+    const lignes = jours.map(({ jour, annonces }) => {
+      const s = archives[jour];
+      const scores = (s && s.scores) || [];
+      const termine = scores.length >= NB_MANCHES;
+      const villes = [...new Set(annonces.map(a => a.ville))].join(', ');
+      const total = scores.reduce((t, r) => t + r.score, 0);
+      if (termine) terminees.push(total);
+
+      let droite, carres = '';
+      if (termine) {
+        droite = `<div class="pts">${total.toLocaleString('fr-FR')} <small>pts</small></div>`;
+        carres = `<div class="sq">${scores.map(r => carre(r.score)).join('')}</div>`;
+      } else if (scores.length > 0) {
+        droite = `<span class="pill-cont">Reprendre · ${scores.length}/${NB_MANCHES}</span>`;
+      } else {
+        droite = `<span class="pill-play">Jouer</span>`;
+      }
+
+      return { jour, termine, html: `
+        <a class="row ${termine ? 'done' : ''}" href="jeu.html?jour=${jour}">
+          <div class="num">#${jour}</div>
+          <div class="mid">
+            <div class="date">${esc(dateDuJour(jour))}</div>
+            <div class="villes">${esc(villes)}</div>
+            ${carres}
+          </div>
+          <div class="right">${droite}</div>
+        </a>` };
+    });
+
+    // Regroupement par mois (du plus récent au plus ancien), le premier volet est ouvert
+    const mois = [];
+    lignes.forEach(l => {
+      const d = dateObj(l.jour);
+      const cle = `${d.getFullYear()}-${d.getMonth()}`;
+      let m = mois[mois.length - 1];
+      if (!m || m.cle !== cle) {
+        const nom = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        m = { cle, label: nom.charAt(0).toUpperCase() + nom.slice(1), items: [] };
+        mois.push(m);
+      }
+      m.items.push(l);
+    });
+
+    liste.innerHTML = mois.map((m, i) => `
+      <details class="mois"${i === 0 ? ' open' : ''}>
+        <summary>
+          <span>${esc(m.label)}</span>
+          <span class="mois-compte">${m.items.filter(l => l.termine).length} / ${m.items.length} jouées</span>
+        </summary>
+        <div class="mois-liste">${m.items.map(l => l.html).join('')}</div>
+      </details>`).join('');
+
+    if (terminees.length) {
+      document.getElementById('sumbar').style.display = 'grid';
+      document.getElementById('sumJouees').textContent = `${terminees.length} / ${jours.length}`;
+      document.getElementById('sumMoyen').textContent = Math.round(terminees.reduce((a, b) => a + b, 0) / terminees.length).toLocaleString('fr-FR');
+      document.getElementById('sumMeilleur').textContent = Math.max(...terminees).toLocaleString('fr-FR');
+    }
+  }
+</script>
+</body>
+</html>
