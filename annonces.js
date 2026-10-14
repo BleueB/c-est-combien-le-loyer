@@ -3838,7 +3838,7 @@ const ANNONCES = [
       { label: "Chauffage", value: "Gaz" },
       { label: "Transports", value: "Non communiqué" },
     ],
-    particularites: "☀️ Lumineux · 🛋️ Meublé",
+    particularites: "☀️ Lumineux · 🛋️ Cuisine équipée",
     note: "Située quartier prisé de Sainte-Savine, cette maison de ville vous offre un accès pratique au centre-ville de Troyes. Vous profiterez d'un espace lumineux avec un grand salon séjour, une cuisine équipée et quatre chambres à l'étage.",
   },
   {
@@ -3942,7 +3942,7 @@ const ANNONCES = [
     lien: "https://www.seloger.com/annonce/location/nouvelle-aquitaine/gironde-33/bordeaux-33000/26MCRFFKT4BM?serp_view=list&search=distributionTypes%3DRent%26estateTypes%3DApartment%26initialQuery%3Dappartement%26locations%3DAD02FR1%26method%3Dtext#ln=classified_search_results&m=classified_search_results_classified_classified_detail_XL",
     source: "SeLoger",
     badges: [
-      { label: "Surface", value: "51 m²" },
+      { label: "Surface", value: "34 m²" },
       { label: "Pièces", value: "1 pièce" },
       { label: "Étage", value: "6e · sans ascenseur" },
       { label: "Meublé", value: "✅ Oui" },
