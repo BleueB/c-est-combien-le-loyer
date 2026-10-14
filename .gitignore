@@ -5,5 +5,7 @@ mockup-*.html
 preview-*.html
 test-*.html
 demo-*.html
+og-image-render.html
+Logos/
 .DS_Store
 node_modules/
