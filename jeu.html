@@ -1674,6 +1674,7 @@
       setTimeout(() => { if(sym2&&txt2){txt2.style.display='none';sym2.style.display='block';} if(s2){s2.style.transform='scale(1.18)';setTimeout(()=>{s2.style.transform='scale(1)';},120);} }, 520);
       setTimeout(() => { clearInterval(iv); if(sym3&&txt3){txt3.style.display='none';sym3.style.display='block';} if(s3){s3.style.transform='scale(1.18)';setTimeout(()=>{s3.style.transform='scale(1)';},120);} if(pin){pin.style.transform='translateY(-16px) scale(1.15)';setTimeout(()=>{pin.style.transform='translateY(0) scale(1)';},220);} }, 760);
     }
+    window._spinLogo = spin;
     window.addEventListener('load', () => setTimeout(spin, 400));
   })();
 </script>
