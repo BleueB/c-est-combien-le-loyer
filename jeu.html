@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/svg+xml" href="Logos/original_minimalist-isometric-vector-logo-of-a-house-shaped copie.svg"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <title>C'est Combien Le Loyer ? 🏠 — Devine le loyer, jeu immobilier quotidien</title>
   <link rel="canonical" href="https://bleueb.github.io/c-est-combien-le-loyer/jeu.html" />
   <meta name="description" content="Joue la partie du jour : 5 vraies annonces immobilières françaises à estimer sur la carte. Devine le loyer charges comprises et compare ton score !"/>
@@ -1589,6 +1589,7 @@
     forceScrollTop();
     requestAnimationFrame(forceScrollTop);
     [20, 60, 150, 300, 600].forEach(d => setTimeout(forceScrollTop, d));
+    if (typeof window._spinLogo === 'function') setTimeout(window._spinLogo, 120);
   }
 
   // --- INIT ---
