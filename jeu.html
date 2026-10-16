@@ -920,7 +920,7 @@
   }
 
   function afficherResultatExistant(r, a) {
-    const v = getVerdict(r.score, r.ecart, currentIndex);
+    const v = r.verdict || getVerdict(r.score, r.ecart, currentIndex);
     document.getElementById('emojiVerdict').textContent = v.emoji;
     document.getElementById('verdictText').textContent = v.text;
     document.getElementById('verdictSub').textContent = v.sub;
@@ -1430,85 +1430,184 @@
   }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+  // --- PHRASES DE VERDICT (après chaque manche) ---
+  // 6 paliers de score. Pour chaque palier : titres, phrases neutres (n), phrases si le joueur a
+  // sous-estimé (s) ou surestimé (e). Les phrases s/e sont ajoutées aux neutres selon le sens de l'erreur.
+  const PHRASES_VERDICT = [
+    { // 0 : score 1000 (écart <= 3 %)
+      titres: ["Parfait !", "Au centime près !", "Chirurgical !", "Pile poil !"],
+      n: [
+        "Tu as le bail sous les yeux, avoue.",
+        "Presque au centime près, respect.",
+        "T'es le propriétaire ou quoi ?",
+        "Même l'agent immobilier n'était pas aussi précis.",
+        "Stéphane Plaza en sueur.",
+        "Tu as un pote dans l'agence, c'est ça ?",
+        "Le notaire demande ton CV.",
+        "Tu devrais facturer tes estimations.",
+        "Sans-faute. Le marché s'incline."
+      ],
+      s: [], e: []
+    },
+    { // 1 : 900 à 999
+      titres: ["Trop fort !", "Monstrueux !", "Redoutable !", "Très fort."],
+      n: [
+        "Vrai expert immo ou vrai coup de chance ?",
+        "J'en connais un qui tient les comptes.",
+        "On ne te la fait pas, à toi.",
+        "Une vision d'aigle…",
+        "Chasseur immobilier en secret ?",
+        "Tu passes trop de temps sur SeLoger le dimanche soir.",
+        "TOUT SIMPLEMENT FABULEUX",
+        "Ton dossier passe en haut de la pile.",
+        "L'agence t'embaucherait sur-le-champ.",
+        "Tu visites encore ou tu signes déjà ?",
+        "Le marché n'a presque plus de secrets pour toi.",
+        "Vraiment fort !"
+      ],
+      s: [
+        "Un tout petit peu radin, mais quel nez !",
+        "Un petit peu en-dessous",
+        "Muscle ton jeu, Robert"
+      ],
+      e: [
+        "Un tout petit peu généreux, mais quel nez !",
+        "Un poil trop"
+      ]
+    },
+    { // 2 : 700 à 899
+      titres: ["Vraiment pas mal !", "Tu as l'œil !", "Solide !", "Très convenable !"],
+      n: [
+        "Tu connais bien ce marché !",
+        "Tu as déjà cherché un appart par ici ?",
+        "On sent que tu as déjà épluché les annonces du coin.",
+        "Encore un petit effort et c'est le sans-faute.",
+        "Le flair est là, il manque juste un peu de précision.",
+        "Bon sens du marché.",
+        "C'était pas loin !"
+      ],
+      s: [
+        "L'œil du pro, il te manquait juste le coût du local vélo.",
+        "Le proprio a vu un peu plus grand que toi.",
+        "Tu n'es pas propriétaire dans le coin, et ça se voit"
+      ],
+      e: [
+        "Un poil généreux : le propriétaire aurait signé tout de suite.",
+        "Tu as visé le standing, l'annonce est plus modeste.",
+        "Le flair est bon, mais tu as vu un peu trop grand.",
+        "Tu pourras donner ton numéro au propriétaire"
+      ]
+    },
+    { // 3 : 450 à 699
+      titres: ["Peut mieux faire !", "Dans la moyenne !", "Mouais...", "Tu peux faire mieux"],
+      n: [
+        "Ce marché te réserve encore des surprises.",
+        "Le marché a encore quelques petits secrets pour toi.",
+        "Tu es quand même loin d'être proche"
+      ],
+      s: [
+        "Tu as oublié de compter les charges de copro ?",
+        "Pas si loin, mais le proprio a été un poil plus gourmand.",
+        "Ici, le mètre carré coûte plus cher que tu ne le crois.",
+        "Parking, balcon, ascenseur : tout ça compte dans le prix.",
+        "Tu as oublié une pièce ?",
+        "C'est combien, le prix d'un pain au chocolat ?"
+      ],
+      e: [
+        "C'est le supplément « charme de l'ancien » qui t'a trompé.",
+        "Pas si loin, mais le proprio a été un poil moins gourmand.",
+        "Ici, on est plus raisonnable que tu ne le pensais.",
+        "Le standing que tu as imaginé n'est pas dans l'annonce."
+      ]
+    },
+    { // 4 : 150 à 449
+      titres: ["Ouch !", "Assez loin du compte"],
+      n: [
+        "Le marché t'a eu cette fois !",
+        "Difficile à estimer !",
+        "Crucifié…",
+        "Cette annonce est un piège, tu n'es pas le premier.",
+        "Tu ne connaissais pas la ville, ça arrive"
+      ],
+      s: [
+        "À ce prix-là, t'as juste la cave et le local poubelles.",
+        "Le propriétaire vient de faire un malaise en voyant ton offre.",
+        "À ce prix-là, tu loues la place de parking, pas l'appartement.",
+        "Ton offre est partie directement à la corbeille de l'agence.",
+        "Avec ce budget, tu as droit au paillasson.",
+        "J'espère que tu as des solides garants",
+        "Ah non l'annonce n'est plus disponible finalement ... Merci hein"
+      ],
+      e: [
+        "Tu as estimé les prix en francs ou quoi ?",
+        "Tu as confondu loyer et prix d'achat ?",
+        "Tu te prends pour un fonds d'investissement ?",
+        "Avec une offre pareille, le propriétaire te signe le bail tout de suite.",
+        "Le proprio cherche à te contacter"
+      ]
+    },
+    { // 5 : moins de 150
+      titres: ["Aïe !", "Catastrophe"],
+      n: [
+        "Le marché n'a pas fini de te surprendre.",
+        "Tu découvres le marché immo français ?",
+        "Reviens demain !",
+        "Dossier refusé immédiatement, même avec 12 garants en CDI.",
+        "Un conseil : relis l'annonce. Et regarde la carte.",
+        "Tu sembles fatigué",
+        "Tu as eu tout faux"
+      ],
+      s: [
+        "Tu vis encore chez tes parents, non ?",
+        "Le propriétaire a cru à une blague.",
+        "Tu comptes payer en tickets-restaurant ?",
+        "Quelqu'un finance tes dépenses ?",
+        "C'est beaaaaucoup plus que ça"
+      ],
+      e: [
+        "Tu loues un appartement ou tout l'immeuble avec ?",
+        "Merci pour le pourboire, le propriétaire s'en souviendra.",
+        "Avec ce budget, tu peux acheter le quartier.",
+        "On n'est pas à New-York l'ami"
+      ]
+    }
+  ];
+  const EMOJIS_VERDICT = ['🎯', '🎯', '🔥', '👍', '😅', '💸'];
+
+  // Phrases contextuelles : remplacent la phrase du palier quand la condition est vraie
+  const PHRASES_CONTEXTE = {
+    deuxExcellentes: "Deux d'affilée, ça commence à être louche.",
+    rebond:          "Beau rebond après la dernière manche.",
+    encoreBas:       "Encore trop bas ! Les loyers montent plus haut que ça.",
+    encoreHaut:      "Encore trop haut ! Ici, c'est plus doux que tu ne crois."
+  };
+
+  function getPalier(score) {
+    return score >= 1000 ? 0 : score >= 900 ? 1 : score >= 700 ? 2 : score >= 450 ? 3 : score >= 150 ? 4 : 5;
+  }
+
+  // Renvoie { emoji, text, sub }. Le résultat est mémorisé dans la sauvegarde de la manche (voir valider()),
+  // pour que la même phrase reste affichée si le joueur recharge la page.
   function getVerdict(score, ecart = 0, indexManche = currentIndex) {
-    if (score >= 900) {
-      const subs = [
-        'Vrai expert immo ou vrai coup de chance ?',
-        'J\'en connais un qui tient les comptes.',
-        'On ne te la fait pas, à toi.',
-        'Une vision d\'aigle…',
-        'Chasseur immobilier en secret ?',
-        'T\'es le propriétaire ou quoi ?',
-        'Même l\'agent immobilier n\'était pas aussi précis.',
-        'Tu passes trop de temps sur SeLoger le dimanche soir.',
-        'Dossier accepté sans garant, direct.',
-        'Stéphane Plaza en sueur.',
-        'Tu as le bail sous les yeux, avoue.',
-        'TOUT SIMPLEMENT FABULEUX'
-      ];
-      // Si la manche précédente était moyenne ou faible (< 700 pts)
-      if (indexManche > 0 && scores[indexManche - 1] && scores[indexManche - 1].score < 500) {
-        subs.push('IL EST DE RETOUR !');
-      }
-      return { emoji: '🎯', text: pick(['Trop fort !', 'Monstrueux !', 'Parfait !', 'Redoutable !']), sub: pick(subs) };
-    }
+    const p = getPalier(score);
+    const ph = PHRASES_VERDICT[p];
+    const prev = indexManche > 0 ? scores[indexManche - 1] : null;
 
-    if (score >= 700) {
-      const subs = [
-        'Vous connaissez bien ce marché !',
-        'Vous avez déjà cherché un appart par ici ?',
-        'Excellent sens du marché.',
-        'On sent que tu as déjà épluché les annonces du coin.',
-        'Presque au centime près, respect.',
-        'L\'œil du pro, il te manquait juste le coût du local vélo.'
-      ];
-      return { emoji: '🔥', text: pick(['Vraiment pas mal !', 'Vous avez l\'œil !', 'Solide !']), sub: pick(subs) };
-    }
+    const subs = [...ph.n];
+    if (ecart < 0) subs.push(...ph.s);
+    else if (ecart > 0) subs.push(...ph.e);
+    // Si la manche précédente était faible (< 500 pts)
+    if (p <= 1 && prev && prev.score < 500) subs.push('IL EST DE RETOUR !');
 
-    if (score >= 450) {
-      const subs = [
-        'Ce marché vous réserve encore des surprises.',
-        'Vous vous défendez bien !',
-        'Pas loin !',
-        'Tu as oublié de compter les charges de copro ?',
-        'Le marché a encore quelques petits secrets pour toi.',
-        'C\'est le supplément "charme de l\'ancien" qui t\'a trompé.'
-      ];
-      if (ecart < 0) {
-        subs.push('Pas si loin, mais le proprio a été un poil plus gourmand.');
-      } else if (ecart > 0) {
-        subs.push('Pas si loin, mais le proprio a été un poil moins gourmand.');
-      }
-      return { emoji: '👍', text: pick(['Peut mieux faire !', 'Dans la bonne fourchette !']), sub: pick(subs) };
+    let sub = pick(subs);
+    // Phrases contextuelles : une chance sur deux seulement, pour ne pas revenir à chaque manche
+    if (prev && Math.random() < 0.5) {
+      if (score >= 900 && prev.score >= 900)                         sub = PHRASES_CONTEXTE.deuxExcellentes;
+      else if (score >= 700 && score < 900 && prev.score < 450)      sub = PHRASES_CONTEXTE.rebond; // ≥ 900 : « IL EST DE RETOUR ! »
+      else if (score < 900 && prev.score < 900 && ecart < 0 && prev.ecart < 0) sub = PHRASES_CONTEXTE.encoreBas;
+      else if (score < 900 && prev.score < 900 && ecart > 0 && prev.ecart > 0) sub = PHRASES_CONTEXTE.encoreHaut;
     }
-
-    if (score >= 150) {
-      const subs = [
-        'Les loyers sont retors par ici…',
-        'Le marché vous a eu cette fois !',
-        'Difficile à estimer !',
-        'Crucifié…',
-        'À ce prix-là, t\'as juste la cave et le local poubelles.',
-        'Tu as estimé les prix en francs ou quoi ?'
-      ];
-      if (ecart < 0) {
-        subs.push('Le propriétaire vient de faire un malaise en voyant ton offre.');
-      }
-      return { emoji: '😅', text: 'Ouch !', sub: pick(subs) };
-    }
-
-    const subs = [
-      'Le marché n\'a pas fini de vous surprendre.',
-      'Vous découvrez le marché immo français ?',
-      'Revenez demain !',
-      'Crucifié…',
-      'Dossier refusé immédiatement, même avec 12 garants en CDI.',
-      'Complètement à côté de la plaque (et du département).'
-    ];
-    if (ecart < 0) {
-      subs.push('Tu vis encore chez tes parents, non ?');
-    }
-    return { emoji: '💸', text: 'Aïe !', sub: pick(subs) };
+    return { emoji: EMOJIS_VERDICT[p], text: pick(ph.titres), sub };
   }
 
   function valider() {
@@ -1519,7 +1618,7 @@
     const ecart = estimation - a.loyer;
     const ecartAbs = Math.abs(ecart);
     const verdict = getVerdict(score, ecart, currentIndex);
-    scores[currentIndex] = { estimation, score, ecart };
+    scores[currentIndex] = { estimation, score, ecart, verdict };
     sauvegarder();
     updateStoryHeader();
     if (typeof umami !== 'undefined') {
