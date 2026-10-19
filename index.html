@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+  <meta name="theme-color" content="#faf9f7"/>
   <title>C'est Combien Le Loyer ? 🏠</title>
   <meta name="google-site-verification" content="F78aw3iSJ0fYptLxZsPotJIic1HmtMSAv1RWDBR7K9s" />
   <link rel="canonical" href="https://bleueb.github.io/c-est-combien-le-loyer/" />
@@ -42,6 +45,7 @@
   </script>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f7f4f804-d83d-4a62-807b-c05fbd748524"></script>
   <script src="annonces.js"></script>
+  <script src="a2hs.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -394,6 +398,11 @@
   <a href="jeu.html" class="btn-jouer" id="btnJouer">Jouer la partie du jour →</a>
 
   <a href="archives.html" class="btn-secondaire" id="btnArchives">📚 Parties précédentes <small id="archivesCount"></small></a>
+
+  <div class="a2hs-block" style="display:none;margin-bottom:14px">
+    <button class="btn-a2hs" onclick="cliquerA2hs()">📲 Ajoute à ton écran d'accueil</button>
+    <div class="a2hs-aide" style="display:none">Crée un raccourci via ton navigateur</div>
+  </div>
 
   <div class="regles">
     <div class="regle"><span class="regle-icon">📍</span><span>Une carte pour situer le logement</span></div>

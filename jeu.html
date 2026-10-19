@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+  <meta name="theme-color" content="#faf9f7"/>
   <title>C'est Combien Le Loyer ? 🏠 — Jeu immobilier quotidien</title>
   <link rel="canonical" href="https://bleueb.github.io/c-est-combien-le-loyer/jeu.html" />
   <meta name="description" content="5 annonces immobilières françaises à estimer par jour, ainsi que les archives jouables. Devine le loyer charges comprises et partage le score à tes contacts !"/>
@@ -42,6 +45,7 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="annonces.js"></script>
+  <script src="a2hs.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1139,10 +1143,15 @@
       <div class="recap-detail">${lignesHTML}</div>
       ${statsEtCompteurHTML}
       <button class="btn-partager" onclick="partagerRecap(${total}, ${max}, '${emojisPartage}')">📤 Partager mon score</button>
+      ${MODE_ARCHIVE ? '' : `<div class="a2hs-block" style="display:none">
+        <button class="btn-a2hs" onclick="cliquerA2hs()">📲 Ajoute à ton écran d'accueil</button>
+        <div class="a2hs-aide" style="display:none">Crée un raccourci via ton navigateur</div>
+      </div>`}
       ${boutonsHTML}
     `;
 
     animerScoreEl(document.getElementById('recapScoreAnim'), total);
+    majBoutonA2hs();
     if (total > 4000 && premiereFois) {
       setTimeout(fireVictoryCannons, 300);
     }
