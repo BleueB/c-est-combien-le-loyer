@@ -227,6 +227,15 @@
       margin-bottom: 8px;
     }
 
+    .serie-badge {
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
     .regles {
       display: flex;
       flex-direction: column;
@@ -396,6 +405,7 @@
   </div>
 
   <a href="jeu.html" class="btn-jouer" id="btnJouer">Jouer la partie du jour →</a>
+  <div class="serie-badge" id="serieBadge" style="display:none"></div>
 
   <a href="archives.html" class="btn-secondaire" id="btnArchives">📚 Parties précédentes <small id="archivesCount"></small></a>
 
@@ -492,10 +502,30 @@
     const villes = [...new Set(annonces.map(a => a.ville))];
     document.getElementById('jourSub').textContent = `${NB_MANCHES} annonces · ${villes.join(', ')}`;
 
-    if (aDejaJoue(numJour)) {
+    const dejaJoue = aDejaJoue(numJour);
+    if (dejaJoue) {
       document.getElementById('dejaJoueMsg').style.display = 'block';
       document.getElementById('btnJouer').textContent = 'Voir mes résultats →';
     }
+
+    // ── Série en cours ──
+    try {
+      const stats = JSON.parse(localStorage.getItem('cctl_stats') || '{}');
+      const streak = stats.currentStreak || 0;
+      if (streak >= 1) {
+        const j = streak === 1 ? 'jour' : 'jours';
+        let msg;
+        if (streak >= 15)     msg = `🏆 ${streak} ${j} de suite — Tu fais partie des joueurs les plus fidèles ! Continue !`;
+        else if (streak >= 10) msg = `🔥 ${streak} ${j} de suite — Ça buuurn !!`;
+        else if (streak >= 7)  msg = `🔥 ${streak} ${j} de suite — Ça ne s'arrête plus !`;
+        else if (streak >= 4)  msg = `🔥 ${streak} ${j} de suite — Tu es on fire !`;
+        else if (streak >= 2)  msg = `🔥 ${streak} ${j} de suite — Keep pushing !`;
+        else                   msg = `🔥 ${streak} ${j} de suite — ne la perds pas !`;
+        const el = document.getElementById('serieBadge');
+        el.textContent = msg;
+        el.style.display = 'block';
+      }
+    } catch {}
   }
   // ── Animation casino logo ──────────────────────────────────────────
   const symbolPool = ['€','?','%','$','£','#','!','&','@','~'];
