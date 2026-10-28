@@ -1211,13 +1211,54 @@
     });
   }
 
+  const PHRASES_PARTAGE = {
+    mauvais: [
+      "J'ai complètement craqué sur le loyer à {ville} 😬",
+      "{ville} m'a mis une claque 💸",
+      "Le marché immo de {ville} et moi, c'est compliqué 🤦",
+      "{ville} m'a humilié 💀",
+      "Je vivais pas dans la réalité par rapport au marché de {ville} 😱",
+      "Le marché immo de {ville} c'est une autre dimension 😤",
+    ],
+    moyen: [
+      "Pas loin à {ville}, mais pas loin c'est pas juste 😅",
+      "{ville} m'a eu de peu 🙂",
+      "J'y étais presque pour {ville} !",
+      "{ville} m'a surpris, j'avoue 😬",
+      "Le marché de {ville} est plus tendu que je pensais 😅",
+    ],
+    bon: [
+      "Je connais mon dada à {ville} 🎯",
+      "{ville} n'a plus de secrets pour moi 📍",
+      "Quasi parfait à {ville} 🔍",
+      "On va dire que je maîtrise {ville} 😎",
+      "Je suis pas loin de devenir agent immo à {ville} 😎",
+    ],
+  };
+
+  function phraseMancheMarquante() {
+    // Trouver la manche avec le plus grand écart absolu
+    let idx = 0;
+    let maxEcart = 0;
+    scores.forEach((r, i) => {
+      const e = Math.abs(r.ecart);
+      if (e > maxEcart) { maxEcart = e; idx = i; }
+    });
+    const ville = ordre[idx].ville;
+    const niveau = maxEcart > 300 ? 'mauvais' : maxEcart > 100 ? 'moyen' : 'bon';
+    const pool = PHRASES_PARTAGE[niveau];
+    const phrase = pool[Math.floor(Math.random() * pool.length)];
+    return phrase.replace('{ville}', ville);
+  }
+
   function partagerRecap(total, max, emojis) {
     const lien = 'https://bleueb.github.io/c-est-combien-le-loyer/';
     const totalStr = total.toLocaleString('fr-FR');
     const maxStr = max.toLocaleString('fr-FR');
+    const phrase = phraseMancheMarquante();
     const texte = MODE_ARCHIVE
-      ? `🏠 C'est Combien Le Loyer ? — Partie #${numJour} 📚\nScore : ${totalStr} / ${maxStr} pts\n${emojis}\n${lien}archives.html`
-      : `🏠 C'est Combien Le Loyer ? — Partie #${numJour}\nScore : ${totalStr} / ${maxStr} pts 🏆\n${emojis}\n${lien}`;
+      ? `🏠 C'est Combien Le Loyer ? — Partie #${numJour} 📚\nScore : ${totalStr} / ${maxStr} pts\n${emojis}\n${phrase}\n${lien}archives.html`
+      : `🏠 C'est Combien Le Loyer ? — Partie #${numJour}\nScore : ${totalStr} / ${maxStr} pts 🏆\n${emojis}\n${phrase}\n${lien}`;
     if (typeof umami !== 'undefined') umami.track('score-partage', { score: total, jour: numJour, ...UMAMI_MODE });
     if (navigator.share) {
       navigator.share({ title: "C'est Combien Le Loyer ?", text: texte }).catch(() => {});
